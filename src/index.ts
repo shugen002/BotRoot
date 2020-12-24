@@ -1,11 +1,10 @@
 import Koa from 'koa'
 import bodyParser from 'koa-bodyparser'
 import { createDecipheriv } from 'crypto'
-import { KHAudioMessage, KHFileMessage, KHImageMessage, KaiheilaEventRequest, KHTextMessage, KHVideoMessage } from './kaiheila.type'
-import { writeFile } from 'fs'
+import { KaiheilaEventRequest, KaiheilaEvent, KHSystemMessage } from './kaiheila.type'
 import { zeroPadding } from './utils'
 import { EventEmitter } from 'events'
-import { AudioMessage, FileMesage, ImageMessage, KMarkDownMessage, MessageType, TextMessage, VideoMessage } from './types'
+import { AudioMessage, FileMesage as FileMessage, ImageMessage, KMarkDownMessage, MessageType, TextMessage, VideoMessage } from './types'
 import axios, { AxiosInstance } from 'axios'
 
 export interface BotConfig{
@@ -34,8 +33,26 @@ const DefaultConfig = {
   port: 8600,
   ignoreDecryptError: true
 }
+interface BotEventEmitter {
+  /**
+   * 获取原始事件，challenge已被剔除
+   */
+  on(event: 'rawEvent', listener: (event:KaiheilaEvent) => void): this;
+  /**
+   * 系统事件，目前还没有，占坑，勿用
+   */
+  on(event: 'systemMessage', listener: (event:KHSystemMessage) => void): this;
+  /**
+   * 注册监听所有处理过的事件
+   */
+  on(event: 'message', listener: (event:TextMessage|ImageMessage|VideoMessage|FileMessage|AudioMessage|KMarkDownMessage) => void): this;
+  /**
+   * 注册监听未知的事件
+   */
+  on(event: 'unknownEvent', listener: (event:KaiheilaEvent) => void): this;
+}
 
-export class KaiheilaBot extends EventEmitter {
+export class KaiheilaBot extends EventEmitter implements BotEventEmitter {
   private key?: Buffer
   config:BotConfig
   private snMap: snMap={}
@@ -122,7 +139,7 @@ export class KaiheilaBot extends EventEmitter {
         this.emit('message', new VideoMessage(eventRequest.d))
         break
       case 4:
-        this.emit('message', new FileMesage(eventRequest.d))
+        this.emit('message', new FileMessage(eventRequest.d))
         break
       case 8:
         this.emit('message', new AudioMessage(eventRequest.d))
