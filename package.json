@@ -9,8 +9,7 @@
     "run": "node dist\\index.js"
   },
   "files": [
-    "dist/**/*",
-    "types/**/*"
+    "dist/**/*"
   ],
   "author": "",
   "license": "ISC",
