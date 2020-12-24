@@ -9,7 +9,8 @@
     "run": "node dist\\index.js"
   },
   "files": [
-    "dist/**/*"
+    "dist/**/*",
+    "types/**/*"
   ],
   "author": "",
   "license": "ISC",
@@ -27,6 +28,8 @@
     "typescript": "^4.1.3"
   },
   "dependencies": {
+    "@types/ws": "^7.4.0",
+    "axios": "^0.21.0",
     "koa": "^2.13.0",
     "koa-bodyparser": "^4.3.0",
     "koa-router": "^10.0.0",
