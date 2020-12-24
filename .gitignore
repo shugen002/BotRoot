@@ -3,3 +3,4 @@ cache
 ecosystem.config.js
 .vscode
 .env
+dist
