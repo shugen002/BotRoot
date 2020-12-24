@@ -205,11 +205,32 @@ export class KaiheilaBot extends EventEmitter {
     })
   }
 
+  getUserIntimacy (userId:string) {
+    return this.get('/api/v3/intimacy/index', {
+      user_id: userId
+    })
+  }
+
+  updateUserIntimacy (userId:string, score?:number, socialInfo?:string, imgId?:number) {
+    return this.post('/api/v3/intimacy/update', {
+      user_id: userId,
+      score,
+      social_info: socialInfo,
+      img_id: imgId
+    })
+  }
+
   private post (url:string, data:any) {
     return this.axios.post(url, JSON.stringify(data), {
       headers: {
         'Content-Type': 'application/json'
       }
+    })
+  }
+
+  private get (url:string, params:any) {
+    return this.axios.get(url, {
+      params: new URLSearchParams(params)
     })
   }
 
