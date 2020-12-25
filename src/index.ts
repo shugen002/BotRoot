@@ -28,12 +28,14 @@ interface snMap{
   [key:number]:number
 }
 
-const DefaultConfig = {
-  mode: 'webhook',
-  port: 8600,
-  ignoreDecryptError: true
+function DefaultConfig () {
+  return {
+    mode: 'webhook',
+    port: 8600,
+    ignoreDecryptError: true
+  }
 }
-interface BotEventEmitter {
+export interface BotEventEmitter {
   /**
    * 获取原始事件，challenge已被剔除
    */
@@ -63,7 +65,8 @@ export class KaiheilaBot extends EventEmitter implements BotEventEmitter {
    */
   constructor (config:BotConfig) {
     super()
-    Object.assign(config, DefaultConfig)
+    this.config = DefaultConfig() as BotConfig
+    Object.assign(this.config, config)
     if (!config.token) {
       throw new Error('Token Not Provided')
     }
@@ -74,7 +77,6 @@ export class KaiheilaBot extends EventEmitter implements BotEventEmitter {
         Authorization: 'Bot ' + this.config.token
       }
     })
-    Object.assign(this.config, DefaultConfig)
     if (config.key) {
       this.key = zeroPadding(config.key || '')
     }

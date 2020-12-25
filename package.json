@@ -1,6 +1,6 @@
 {
   "name": "kaiheila-bot-root",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -11,7 +11,7 @@
     "dist/**/*"
   ],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@types/koa": "^2.11.6",
     "@types/koa-bodyparser": "^4.3.0",
