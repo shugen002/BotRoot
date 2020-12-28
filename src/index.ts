@@ -6,7 +6,7 @@ import { zeroPadding } from './utils'
 import { EventEmitter } from 'events'
 import { AudioMessage, FileMesage as FileMessage, ImageMessage, KMarkDownMessage, MessageType, TextMessage, VideoMessage } from './types'
 import axios, { AxiosInstance } from 'axios'
-
+import { cloneDeep } from 'lodash'
 export interface BotConfig{
   mode: 'webhook'|'websocket'|'pc';
   port?: number;
@@ -122,35 +122,35 @@ export class KaiheilaBot extends EventEmitter implements BotEventEmitter {
 
   private handleMessage (eventRequest:KaiheilaEventRequest) {
     try {
-      this.emit('rawEvent', eventRequest.d)
+      this.emit('rawEvent', cloneDeep(eventRequest.d))
     } catch (error) {
       this.emit('error', error)
     }
 
     switch (eventRequest.d.type) {
       case 255:
-        this.emit('systemMessage', eventRequest.d)
+        this.emit('systemMessage', cloneDeep(eventRequest.d))
         break
       case 1:
-        this.emit('message', new TextMessage(eventRequest.d))
+        this.emit('message', new TextMessage(cloneDeep(eventRequest.d)))
         break
       case 2:
-        this.emit('message', new ImageMessage(eventRequest.d))
+        this.emit('message', new ImageMessage(cloneDeep(eventRequest.d)))
         break
       case 3:
-        this.emit('message', new VideoMessage(eventRequest.d))
+        this.emit('message', new VideoMessage(cloneDeep(eventRequest.d)))
         break
       case 4:
-        this.emit('message', new FileMessage(eventRequest.d))
+        this.emit('message', new FileMessage(cloneDeep(eventRequest.d)))
         break
       case 8:
-        this.emit('message', new AudioMessage(eventRequest.d))
+        this.emit('message', new AudioMessage(cloneDeep(eventRequest.d)))
         break
       case 9:
-        this.emit('message', new KMarkDownMessage(eventRequest.d))
+        this.emit('message', new KMarkDownMessage(cloneDeep(eventRequest.d)))
         break
       default:
-        this.emit('unknownEvent', eventRequest.d)
+        this.emit('unknownEvent', cloneDeep(eventRequest.d))
         break
     }
   }

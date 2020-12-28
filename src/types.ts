@@ -1,15 +1,17 @@
 import { KaiheilaBot } from '.'
 import { KHAuthor, KHTextMessage, KHEventBase, KHImageMessage, KHAttachment, KHVideoAttachment, KHVideoMessage, KHFileAttachment, KHFileMessage, KHAudioAttachment, KHKMarkDownMessage, KHAudioMessage } from './kaiheila.type'
 
-const defaultUser = {
-  username: '',
-  identifyNum: '0',
-  avatar: 'https://img.kaiheila.cn/assets/avatar_1.jpg/icon',
-  id: '',
-  nickname: '',
-  roles: [],
-  bot: false,
-  online: true
+function defaultUser () {
+  return {
+    username: '',
+    identifyNum: '0',
+    avatar: 'https://img.kaiheila.cn/assets/avatar_1.jpg/icon',
+    id: '',
+    nickname: '',
+    roles: [],
+    bot: false,
+    online: true
+  }
 }
 
 export enum MessageType {
@@ -53,8 +55,9 @@ export class User {
    * 是否在线
    */
   online: boolean;
-  constructor (author:KHAuthor|User = defaultUser) {
-    Object.assign(author, defaultUser)
+  constructor (rawAuthor:KHAuthor|User = defaultUser()) {
+    const author = defaultUser()
+    Object.assign(author, rawAuthor)
     // @ts-ignore
     this.identifyNum = typeof author.identify_num === 'string' ? author.identify_num : author.identifyNum
     this.avatar = author.avatar
