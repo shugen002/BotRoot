@@ -1,6 +1,6 @@
 {
   "name": "kaiheila-bot-root",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -10,7 +10,8 @@
   "files": [
     "dist/**/*"
   ],
-  "author": "",
+  "repository": "shugen002/BotRoot",
+  "author": "Shugen002",
   "license": "MIT",
   "devDependencies": {
     "@types/koa": "^2.11.6",
