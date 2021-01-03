@@ -17,6 +17,10 @@ export interface BotConfig{
    */
   verifyToken?:string;
   /**
+   * cookie 客户端模拟模式必填。
+   */
+  cookies?:string;
+  /**
    * 是否忽略解密错误的消息
    * 也不会产生error事件，会直接next
    */
@@ -59,6 +63,7 @@ export class KaiheilaBot extends EventEmitter implements BotEventEmitter {
   config:BotConfig
   private snMap: snMap={}
   axios: AxiosInstance
+  httpServer?:Koa<Koa.DefaultState, Koa.DefaultContext>
   /**
    * 开黑啦机器人实例
    * @param config 设置
@@ -71,12 +76,22 @@ export class KaiheilaBot extends EventEmitter implements BotEventEmitter {
       throw new Error('Token Not Provided')
     }
     this.config = config
-    this.axios = axios.create({
-      baseURL: 'https://www.kaiheila.cn/api',
-      headers: {
-        Authorization: 'Bot ' + this.config.token
-      }
-    })
+    if (this.config.mode === 'pc') {
+      this.axios = axios.create({
+        baseURL: 'https://www.kaiheila.cn/api',
+        headers: {
+          cookies: this.config.cookies
+        }
+      })
+    } else {
+      this.axios = axios.create({
+        baseURL: 'https://www.kaiheila.cn/api',
+        headers: {
+          Authorization: 'Bot ' + this.config.token
+        }
+      })
+    }
+
     if (config.key) {
       this.key = zeroPadding(config.key || '')
     }
@@ -183,7 +198,7 @@ export class KaiheilaBot extends EventEmitter implements BotEventEmitter {
     if (typeof body !== 'object' || typeof body.s !== 'number' || typeof body.d !== 'object') {
       return false
     }
-    if (this.config.mode === 'webhook' && body.verify_token !== this.config.verifyToken) {
+    if (this.config.mode === 'webhook' && body.d.verify_token !== this.config.verifyToken) {
       return false
     }
     return true
@@ -256,13 +271,19 @@ export class KaiheilaBot extends EventEmitter implements BotEventEmitter {
   /**
    * 启动监听
    *
-   * 会在指定端口号启动一个http服务
+   * webhook模式下会在指定端口号启动一个http服务
    */
   listen () {
     const app = new Koa()
     app.use(bodyParser())
     app.use(this.getMiddleware())
+    this.httpServer = app
     app.listen(this.config.port)
+  }
+
+  async getUserState () {
+    const res = await this.axios.get('/v2/user/user-state')
+    return res.data
   }
 
   /**
