@@ -1,6 +1,7 @@
+import { EventEmitter } from 'events'
 import { KaiheilaBot } from '.'
-import { KHAuthor, KHTextMessage, KHEventBase, KHImageMessage, KHAttachment, KHVideoAttachment, KHVideoMessage, KHFileAttachment, KHFileMessage, KHAudioAttachment, KHKMarkDownMessage, KHAudioMessage } from './kaiheila.type'
-
+import { KHAuthor, KHTextMessage, KHEventBase, KHImageMessage, KHAttachment, KHVideoAttachment, KHVideoMessage, KHFileAttachment, KHFileMessage, KHAudioAttachment, KHKMarkDownMessage, KHAudioMessage } from './types/kaiheila/kaiheila.type'
+import { KHPacket } from './types/kaiheila/packet'
 function defaultUser () {
   return {
     username: '',
@@ -81,14 +82,21 @@ export class MessageBase {
   guildId:string='';
   channelType: string;
   authorId: string;
-  constructor (message:KHEventBase) {
+  constructor (message:KHEventBase, reply = false) {
     this.type = message.type
-    this.msgId = message.msg_id
-    this.msgTimestamp = message.msg_timestamp
-    this.guildId = message.extra.guild_id
     this.channelType = message.channel_type
     this.channelId = message.target_id
-    this.authorId = message.author_id
+    if (reply) {
+      this.authorId = message.author.id
+      this.guildId = message.guild_id
+      this.msgId = message.id
+      this.msgTimestamp = message.create_at
+    } else {
+      this.authorId = message.author_id
+      this.msgId = message.msg_id
+      this.guildId = message.extra.guild_id
+      this.msgTimestamp = message.msg_timestamp
+    }
   }
 }
 
@@ -117,20 +125,37 @@ export class TextMessage extends MessageBase {
     here: boolean
   };
 
-  constructor (message:KHTextMessage) {
-    super(message)
+  constructor (message:KHTextMessage, reply = false) {
+    super(message, reply)
     this.content = message.content
-    this.channelName = message.extra.channel_name
-    this.code = message.extra.code
-    this.author = new User(message.extra.author)
-    if (message.extra.quote) {
-      this.quote = new TextMessage(message.extra.quote)
+    if (reply) {
+      this.channelName = ''
+      this.author = new User(message.author)
+      this.code = message.code
+      this.mention = {
+        user: message.mention,
+        roles: message.mention_roles,
+        all: message.mention_all,
+        here: message.mention_here
+      }
+    } else {
+      this.channelName = message.extra.channel_name
+      this.code = message.extra.code
+      this.author = new User(message.extra.author)
+      this.mention = {
+        user: message.extra.mention,
+        roles: message.extra.mention_roles,
+        all: message.extra.mention_all,
+        here: message.extra.mention_here
+      }
     }
-    this.mention = {
-      user: message.extra.mention,
-      roles: message.extra.mention_roles,
-      all: message.extra.mention_all,
-      here: message.extra.mention_here
+
+    if (!reply && message.extra.quote) {
+      this.quote = new TextMessage(message.extra.quote, true)
+      // patch for non exist properties in reply
+      this.quote.channelName = this.channelName
+      this.quote.channelType = this.channelType
+      this.quote.channelId = this.channelId
     }
   }
 }
@@ -259,4 +284,10 @@ export class KMarkDownMessage extends MessageBase {
       channels: message.extra.nav_channels
     }
   }
+}
+
+export interface MessageSource extends EventEmitter{
+  type:string
+  on(event:'message', listener:(eventRequest:KHPacket)=>void):this;
+  connect():Promise<boolean>;
 }

@@ -1,15 +1,7 @@
-/* eslint-disable camelcase */
-export enum KaiheilaCMD {
-  msg= 0,
-  handshake= 1,
-  ping= 2,
-  pong= 3,
-  resume= 4,
-  reconnect= 5,
-  resumeack= 6
-}
+import { KHPacket } from './packet'
 
-interface WebhookChallenge {
+/* eslint-disable camelcase */
+interface KHWebhookChallenge {
   verify_token: string
   type: 255
   channel_type: 'WEBHOOK_CHALLENGE'
@@ -190,7 +182,7 @@ export interface KHKMarkDownMessage extends KHEventBase{
   }
 }
 
-export type KaiheilaEvent =
+export type KHMessage =
   | KHSystemMessage
   | KHTextMessage
   | KHImageMessage
@@ -199,12 +191,8 @@ export type KaiheilaEvent =
   | KHAudioMessage
   | KHKMarkDownMessage
 
-export interface KaiheilaEncryptRequest{
+export interface KaiheilaEncryptPacket{
   encrypt:string
 }
-export interface KaiheilaEventRequest {
-  s: KaiheilaCMD.msg
-  d: KaiheilaEvent | WebhookChallenge
-  sn: number
-}
-export type KaiheilaWebhookRequest = KaiheilaEncryptRequest | KaiheilaEventRequest
+
+export type KaiheilaWebhookRequest = KaiheilaEncryptPacket | KHPacket

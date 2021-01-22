@@ -1,12 +1,15 @@
-import Koa from 'koa'
-import bodyParser from 'koa-bodyparser'
-import { createDecipheriv } from 'crypto'
-import { KaiheilaEventRequest, KaiheilaEvent, KHSystemMessage } from './kaiheila.type'
+import { KHMessage, KHSystemMessage } from './types/kaiheila/kaiheila.type'
+import { KHPacket } from './types/kaiheila/packet'
 import { zeroPadding } from './utils'
 import { EventEmitter } from 'events'
-import { AudioMessage, FileMesage as FileMessage, ImageMessage, KMarkDownMessage, MessageType, TextMessage, VideoMessage } from './types'
+import { AudioMessage, FileMesage as FileMessage, ImageMessage, KMarkDownMessage, MessageSource, MessageType, TextMessage, VideoMessage } from './types'
 import axios, { AxiosInstance } from 'axios'
 import { cloneDeep } from 'lodash'
+import WebhookSource from './MessageSource/WebhookSource'
+import { KHGetGatewayResponse, KHAPIResponse, KHGetCurrentUserInfoResponse } from './types/kaiheila/api'
+import RequestError from './error/RequestError'
+import { CurrentUserInfo, GetGatewayResponse } from './types/api'
+import WebSocketSource from './MessageSource/WebSocketSource'
 export interface BotConfig{
   mode: 'webhook'|'websocket'|'pc';
   port?: number;
@@ -28,10 +31,6 @@ export interface BotConfig{
 
 }
 
-interface snMap{
-  [key:number]:number
-}
-
 function DefaultConfig () {
   return {
     mode: 'webhook',
@@ -43,7 +42,7 @@ export interface BotEventEmitter {
   /**
    * 获取原始事件，challenge已被剔除
    */
-  on(event: 'rawEvent', listener: (event:KaiheilaEvent) => void): this;
+  on(event: 'rawEvent', listener: (event:KHMessage) => void): this;
   /**
    * 系统事件，目前还没有，占坑，勿用
    */
@@ -55,15 +54,13 @@ export interface BotEventEmitter {
   /**
    * 注册监听未知的事件
    */
-  on(event: 'unknownEvent', listener: (event:KaiheilaEvent) => void): this;
+  on(event: 'unknownEvent', listener: (event:KHMessage) => void): this;
 }
 
-export class KaiheilaBot extends EventEmitter implements BotEventEmitter {
-  private key?: Buffer
+export class KaiheilaBot extends EventEmitter {
   config:BotConfig
-  private snMap: snMap={}
   axios: AxiosInstance
-  httpServer?:Koa<Koa.DefaultState, Koa.DefaultContext>
+  messageSource:MessageSource
   /**
    * 开黑啦机器人实例
    * @param config 设置
@@ -76,66 +73,38 @@ export class KaiheilaBot extends EventEmitter implements BotEventEmitter {
       throw new Error('Token Not Provided')
     }
     this.config = config
-    if (this.config.mode === 'pc') {
-      this.axios = axios.create({
-        baseURL: 'https://www.kaiheila.cn/api',
-        headers: {
-          cookies: this.config.cookies
-        }
-      })
-    } else {
-      this.axios = axios.create({
-        baseURL: 'https://www.kaiheila.cn/api',
-        headers: {
-          Authorization: 'Bot ' + this.config.token
-        }
-      })
-    }
-
-    if (config.key) {
-      this.key = zeroPadding(config.key || '')
-    }
-  }
-
-  /**
-   * 获取中间件
-   * 可用于共用Koa实例。
-   */
-  getMiddleware () {
-    return this.route.bind(this)
-  }
-
-  private async route (context:Koa.ParameterizedContext<Koa.DefaultState, Koa.DefaultContext>, next:Koa.Next) {
-    const request = context.request.body
-    let eventRequest:KaiheilaEventRequest
-    if (this.key) {
-      try {
-        eventRequest = this.decryptRequest(request)
-      } catch (error) {
-        if (this.config.ignoreDecryptError) {
-          return next()
-        } else {
-          this.emit('error', error)
-          context.throw('Not Kaiheila Request or bad encryption or unencrypted request', 500)
-        }
+    // if (this.config.mode === 'pc') {
+    //   this.axios = axios.create({
+    //     baseURL: 'https://www.kaiheila.cn/api',
+    //     headers: {
+    //       cookies: this.config.cookies
+    //     }
+    //   })
+    // } else {
+    this.axios = axios.create({
+      baseURL: 'https://www.kaiheila.cn/api',
+      headers: {
+        Authorization: 'Bot ' + this.config.token
       }
-    } else {
-      eventRequest = request
+    })
+    // }
+    switch (this.config.mode) {
+      case 'websocket':
+        this.messageSource = new WebSocketSource(this)
+        break
+
+      default:
+        this.messageSource = new WebhookSource(config as {
+          key?:string,
+          port:number,
+          verifyToken?:string
+        })
+        this.messageSource.on('message', this.handleMessage.bind(this))
+        break
     }
-    if (!this.verifyRequest(eventRequest)) {
-      return next()
-    }
-    if (this.handleChallenge(eventRequest, context)) {
-      return
-    }
-    context.body = 1
-    if (!this.verifySN(eventRequest)) {
-      return
-    }
-    this.handleMessage(eventRequest)
   }
 
-  private handleMessage (eventRequest:KaiheilaEventRequest) {
+  private handleMessage (eventRequest:KHPacket) {
     try {
       this.emit('rawEvent', cloneDeep(eventRequest.d))
     } catch (error) {
@@ -171,58 +140,6 @@ export class KaiheilaBot extends EventEmitter implements BotEventEmitter {
   }
 
   /**
-   * 解密
-   * @param request 请求体
-   */
-  private decryptRequest (request:any) {
-    if (typeof request.encrypt === 'string') {
-      if (!this.key) {
-        throw new Error('No Key')
-      }
-      const encrypted = Buffer.from(request.encrypt, 'base64')
-      const iv = encrypted.subarray(0, 16)
-      const encryptedData = Buffer.from(encrypted.subarray(16, encrypted.length).toString(), 'base64')
-      const decipher = createDecipheriv('aes-256-cbc', this.key, iv)
-      const decrypt = Buffer.concat([decipher.update(encryptedData), decipher.final()])
-      const data = JSON.parse(decrypt.toString())
-      return data as KaiheilaEventRequest
-    } else {
-      if (this.config.ignoreDecryptError) {
-        throw new Error('Unencrypted Request')
-      }
-      return request as KaiheilaEventRequest
-    }
-  }
-
-  private verifyRequest (body:any) {
-    if (typeof body !== 'object' || typeof body.s !== 'number' || typeof body.d !== 'object') {
-      return false
-    }
-    if (this.config.mode === 'webhook' && body.d.verify_token !== this.config.verifyToken) {
-      return false
-    }
-    return true
-  }
-
-  private verifySN (body:KaiheilaEventRequest) {
-    if (this.snMap[body.sn as number] && this.snMap[body.sn as number] - Date.now() < 1000 * 600) {
-      return false
-    }
-    this.snMap[body.sn as number] = Date.now()
-    return true
-  }
-
-  private handleChallenge (eventRequest:KaiheilaEventRequest, context:Koa.ParameterizedContext<Koa.DefaultState, Koa.DefaultContext>) {
-    if (eventRequest.d.type === 255 && eventRequest.d.channel_type === 'WEBHOOK_CHALLENGE') {
-      context.body = {
-        challenge: eventRequest.d.challenge
-      }
-      return true
-    }
-    return false
-  }
-
-  /**
    * 发送频道聊天消息
    * @param type 消息类型
    * @param channelId 目标频道 id
@@ -239,14 +156,18 @@ export class KaiheilaBot extends EventEmitter implements BotEventEmitter {
     })
   }
 
+  /**
+   * 获取用户亲密度
+   * @param userId 用户id
+   */
   getUserIntimacy (userId:string) {
-    return this.get('/api/v3/intimacy/index', {
+    return this.get('v3/intimacy/index', {
       user_id: userId
     })
   }
 
   updateUserIntimacy (userId:string, score?:number, socialInfo?:string, imgId?:number) {
-    return this.post('/api/v3/intimacy/update', {
+    return this.post('v3/intimacy/update', {
       user_id: userId,
       score,
       social_info: socialInfo,
@@ -254,7 +175,7 @@ export class KaiheilaBot extends EventEmitter implements BotEventEmitter {
     })
   }
 
-  private post (url:string, data:any) {
+  post (url:string, data:any) {
     return this.axios.post(url, JSON.stringify(data), {
       headers: {
         'Content-Type': 'application/json'
@@ -262,34 +183,67 @@ export class KaiheilaBot extends EventEmitter implements BotEventEmitter {
     })
   }
 
-  private get (url:string, params:any) {
+  get (url:string, params:any) {
     return this.axios.get(url, {
       params: new URLSearchParams(params)
     })
   }
 
   /**
-   * 启动监听
-   *
-   * webhook模式下会在指定端口号启动一个http服务
+   * 拉取机器人所在的所有服务器。
    */
-  listen () {
-    const app = new Koa()
-    app.use(bodyParser())
-    app.use(this.getMiddleware())
-    this.httpServer = app
-    app.listen(this.config.port)
-  }
-
-  async getUserState () {
-    const res = await this.axios.get('/v2/user/user-state')
+  async getGuildList () {
+    const res = await this.get('v3/guild/index', {})
     return res.data
   }
 
+  async getGateWay (compress = 0) {
+    const data = (await this.get('v3/gateway/index', {
+      compress
+    })).data as KHAPIResponse<KHGetGatewayResponse>
+    if (data.code === 0) {
+      return data.data as GetGatewayResponse
+    } else {
+      throw new RequestError(data.code, data.message)
+    }
+  }
+
+  async getCurrentUserInfo () {
+    const data = (await this.get('v3/user/me', {})).data as KHAPIResponse<KHGetCurrentUserInfoResponse>
+    if (data.code === 0) {
+      return {
+        id: data.data.id,
+        username: data.data.username,
+        identifyNum: data.data.identify_num,
+        online: data.data.online,
+        status: data.data.status,
+        avatar: data.data.avatar,
+        bot: data.data.bot,
+        mobileVerified: data.data.mobile_verified,
+        system: data.data.system,
+        mobilePrefix: data.data.mobile_prefix,
+        invitedCount: data.data.invited_count,
+        mobile: data.data.mobile
+      } as CurrentUserInfo
+    } else {
+      throw new RequestError(data.code, data.message)
+    }
+  }
+
   /**
-   * 链接Websocket
+   * 链接消息源
    */
   connect () {
-    throw new Error('not support yet')
+    this.messageSource.connect()
+  }
+
+  /**
+   * 启动监听
+   *
+   * webhook模式下会在指定端口号启动一个http服务
+   * @deprecated 使用connect替代
+   */
+  listen () {
+    this.messageSource.connect()
   }
 }

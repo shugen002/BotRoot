@@ -2,12 +2,13 @@ const Bot = require('./dist').KaiheilaBot
 const { writeFile } = require('fs')
 const bot = new Bot({
   port: 8600,
+  mode: 'webhook',
   key: process.env.key,
   token: process.env.token,
-  verifyToken: 'vC6PnnZm5UtDRf_S'
+  verifyToken: process.env.verifyToken
 })
 
-bot.listen()
+bot.connect()
 bot.on('rawEvent', (e) => {
   console.log(e)
   if (typeof e.msg_id === 'string') {
