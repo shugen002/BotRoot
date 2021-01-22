@@ -6,7 +6,7 @@ import { AudioMessage, FileMesage as FileMessage, ImageMessage, KMarkDownMessage
 import axios, { AxiosInstance } from 'axios'
 import { cloneDeep } from 'lodash'
 import WebhookSource from './MessageSource/WebhookSource'
-import { KHGetGatewayResponse, KHAPIResponse, KHGetCurrentUserInfoResponse } from './types/kaiheila/api'
+import { KHGetGatewayResponse, KHAPIResponse, KHGetCurrentUserInfoResponse, KHGrantUserRoleResponse } from './types/kaiheila/api'
 import RequestError from './error/RequestError'
 import { CurrentUserInfo, GetGatewayResponse } from './types/api'
 import WebSocketSource from './MessageSource/WebSocketSource'
@@ -225,6 +225,27 @@ export class KaiheilaBot extends EventEmitter {
         invitedCount: data.data.invited_count,
         mobile: data.data.mobile
       } as CurrentUserInfo
+    } else {
+      throw new RequestError(data.code, data.message)
+    }
+  }
+
+  /**
+   * 给用户角色
+   *
+   * @param {string} guildId 服务器ID
+   * @param {string} userId 用户ID
+   * @param {string|number} roleId 角色ID
+   * @memberof KaiheilaBot
+   */
+  async grantUserRole (guildId: string, userId: string, roleId: string|number) {
+    const data = (await this.post('v3/guild-role/grant', { guild_id: guildId, user_id: userId, role_id: roleId })).data as KHAPIResponse<KHGrantUserRoleResponse>
+    if (data.code === 0) {
+      return {
+        userId: data.data.user_id,
+        guildId: data.data.guild_id,
+        roles: data.data.roles
+      }
     } else {
       throw new RequestError(data.code, data.message)
     }
