@@ -71,3 +71,18 @@ export interface KHGetCurrentUserInfoResponse{
   invited_count:number
 
 }
+
+export interface KHGrantUserRoleResponse{
+  /**
+   * 用户ID
+   */
+  user_id: string
+  /**
+   * 服务器ID
+   */
+  guild_id: string
+  /**
+   * 用户当前拥有的角色（操作后）
+   */
+  roles: number[]
+}
