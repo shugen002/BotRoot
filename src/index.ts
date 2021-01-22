@@ -239,7 +239,8 @@ export class KaiheilaBot extends EventEmitter {
    * @memberof KaiheilaBot
    */
   async grantUserRole (guildId: string, userId: string, roleId: string|number) {
-    const data = (await this.post('v3/guild-role/grant', { guild_id: guildId, user_id: userId, role_id: roleId })).data as KHAPIResponse<KHGrantUserRoleResponse>
+    if (typeof roleId === 'string') roleId = parseInt(roleId)
+    const data = (await this.post('v3/guild-role/grant', { guild_id: guildId, user_id: userId, role_id: roleId})).data as KHAPIResponse<KHGrantUserRoleResponse>
     if (data.code === 0) {
       return {
         userId: data.data.user_id,
