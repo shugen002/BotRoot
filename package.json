@@ -1,6 +1,6 @@
 {
   "name": "kaiheila-bot-root",
-  "version": "0.0.9",
+  "version": "0.0.11-beta.1",
   "description": "",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -30,6 +30,7 @@
     "@types/lodash": "^4.14.166",
     "@types/ws": "^7.4.0",
     "axios": "^0.21.1",
+    "form-data": "^3.0.0",
     "koa": "^2.13.0",
     "koa-bodyparser": "^4.3.0",
     "koa-router": "^10.0.0",

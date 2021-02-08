@@ -1,15 +1,19 @@
+import axios, { AxiosInstance } from 'axios'
+import { cloneDeep } from 'lodash'
+import { EventEmitter } from 'events'
+import FormData, { Stream } from 'form-data'
+
 import { KHMessage, KHSystemMessage } from './types/kaiheila/kaiheila.type'
 import { KHPacket } from './types/kaiheila/packet'
 import { zeroPadding } from './utils'
-import { EventEmitter } from 'events'
 import { AudioMessage, FileMesage as FileMessage, ImageMessage, KMarkDownMessage, MessageSource, MessageType, TextMessage, VideoMessage } from './types'
-import axios, { AxiosInstance } from 'axios'
-import { cloneDeep } from 'lodash'
 import WebhookSource from './MessageSource/WebhookSource'
-import { KHGetGatewayResponse, KHAPIResponse, KHGetCurrentUserInfoResponse, KHGrantUserRoleResponse } from './types/kaiheila/api'
+import { KHGetGatewayResponse, KHAPIResponse, KHGetCurrentUserInfoResponse, KHGrantUserRoleResponse, KHRole } from './types/kaiheila/api'
 import RequestError from './error/RequestError'
-import { CurrentUserInfo, GetGatewayResponse } from './types/api'
+import { CurrentUserInfo, GetGatewayResponse, UserRoleResponse } from './types/api'
 import WebSocketSource from './MessageSource/WebSocketSource'
+import { Role } from './types/types'
+
 export interface BotConfig{
   mode: 'webhook'|'websocket'|'pc';
   port?: number;
@@ -240,13 +244,163 @@ export class KaiheilaBot extends EventEmitter {
    */
   async grantUserRole (guildId: string, userId: string, roleId: string|number) {
     if (typeof roleId === 'string') roleId = parseInt(roleId)
-    const data = (await this.post('v3/guild-role/grant', { guild_id: guildId, user_id: userId, role_id: roleId})).data as KHAPIResponse<KHGrantUserRoleResponse>
+    const data = (await this.post('v3/guild-role/grant', { guild_id: guildId, user_id: userId, role_id: roleId })).data as KHAPIResponse<KHGrantUserRoleResponse>
     if (data.code === 0) {
       return {
         userId: data.data.user_id,
         guildId: data.data.guild_id,
         roles: data.data.roles
-      }
+      } as UserRoleResponse
+    } else {
+      throw new RequestError(data.code, data.message)
+    }
+  }
+
+  async revokeUserRole (guildId: string, userId: string, roleId: string|number) {
+    if (typeof roleId === 'string') roleId = parseInt(roleId)
+    const data = (await this.post('v3/guild-role/revoke', { guild_id: guildId, user_id: userId, role_id: roleId })).data as KHAPIResponse<KHGrantUserRoleResponse>
+    if (data.code === 0) {
+      return {
+        userId: data.data.user_id,
+        guildId: data.data.guild_id,
+        roles: data.data.roles
+      } as UserRoleResponse
+    } else {
+      throw new RequestError(data.code, data.message)
+    }
+  }
+
+  /**
+   * 获取服务器角色列表
+   * @param guildId 服务器的id
+   */
+  async getGuildRolesList (guildId:string) {
+    const data = (await this.get('v3/guild-role/index', {
+      guild_id: guildId
+    })).data as KHAPIResponse<KHRole[]>
+    if (data.code === 0) {
+      return data.data.map(role => {
+        return {
+          roleId: role.role_id,
+          name: role.name,
+          color: role.color,
+          position: role.position,
+          hoist: role.hoist,
+          mentionable: role.mentionable,
+          permissions: role.permissions
+        }
+      }) as Role[]
+    } else {
+      throw new RequestError(data.code, data.message)
+    }
+  }
+
+  /**
+ * 创建服务器角色
+ * @param name 角色名称
+ * @param guildId 服务器id
+ * @returns 创建的角色
+ */
+  async createGuildRole (guildId:string, name?:string) {
+    const data = (await this.post('v3/guild-role/create', {
+      name,
+      guild_id: guildId
+    })).data as KHAPIResponse<KHRole>
+    if (data.code === 0) {
+      return {
+        roleId: data.data.role_id,
+        name: data.data.name,
+        color: data.data.color,
+        position: data.data.position,
+        hoist: data.data.hoist,
+        mentionable: data.data.mentionable,
+        permissions: data.data.permissions
+      } as Role
+    } else {
+      throw new RequestError(data.code, data.message)
+    }
+  }
+
+  /**
+   * 更新服务器角色权限
+   * @param role 角色预期修改后的样子
+   * @param guildId 服务器id
+   * @returns 更新后的角色
+   */
+  async updateGuildRole (guildId:string, role:Role) {
+    const data = (await this.post('v3/guild-role/create', {
+      guild_id: guildId,
+      name: role.name,
+      color: role.color,
+      role_id: role.roleId,
+      hoist: role.roleId,
+      mentionable: role.mentionable,
+      permissions: role.permissions
+    })).data as KHAPIResponse<KHRole>
+    if (data.code === 0) {
+      return {
+        roleId: data.data.role_id,
+        name: data.data.name,
+        color: data.data.color,
+        position: data.data.position,
+        hoist: data.data.hoist,
+        mentionable: data.data.mentionable,
+        permissions: data.data.permissions
+      } as Role
+    } else {
+      throw new RequestError(data.code, data.message)
+    }
+  }
+
+  /**
+   * 删除服务器角色
+   * @param guildId 服务器id
+   * @param roleId 角色id
+   */
+  async deleteGuildRole (guildId:string, roleId:string|number) {
+    const data = (await this.post('v3/guild-role/delete', {
+      guild_id: guildId,
+      rold_id: roleId
+    })).data as KHAPIResponse<[]>
+    if (data.code === 0) {
+      return true
+    } else {
+      throw new RequestError(data.code, data.message)
+    }
+  }
+
+  /**
+   * 上传文件
+   * @param file 文件，看到参数错误时需要在选项中补齐文件相关内容。
+   * @param option 选项，参见 [form-data](https://github.com/form-data/form-data)
+   */
+  async createAsset (file:Buffer|Stream, option?:FormData.AppendOptions) {
+    const form = new FormData()
+    form.append('file', file, option)
+    const data = (await this.axios.post('v3/asset/create', form, {
+      headers: form.getHeaders()
+    })).data as KHAPIResponse<{url:string}>
+    if (data.code === 0) {
+      return data.data.url
+    } else {
+      throw new RequestError(data.code, data.message)
+    }
+  }
+
+  /**
+   * 修改服务器中用户的昵称
+   * @param guildId 服务器的 ID
+   * @param userId 要修改昵称的目标用户 ID，不传则修改当前登陆用户的昵称
+   * @param nickname 昵称，2 - 64 长度，不传则清空昵称
+   */
+  async modifyUserNickname (guildId:string, userId?:string, nickname?:string) {
+    const data = (await this.post('v3/guild/nickname', {
+      guild_id: guildId,
+      user_id: userId,
+      nickname: nickname
+    })).data as KHAPIResponse<[]>
+    if (data.code === 0) {
+      return true
     } else {
       throw new RequestError(data.code, data.message)
     }
