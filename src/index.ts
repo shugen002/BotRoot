@@ -95,8 +95,8 @@ export class KaiheilaBot extends EventEmitter {
     switch (this.config.mode) {
       case 'websocket':
         this.messageSource = new WebSocketSource(this)
+        this.messageSource.on('message', this.handleMessage.bind(this))
         break
-
       default:
         this.messageSource = new WebhookSource(config as {
           key?:string,
