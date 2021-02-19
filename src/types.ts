@@ -218,7 +218,7 @@ export class FileAttachment extends Attachment {
   }
 }
 
-export class FileMesage extends MessageBase {
+export class FileMessage extends MessageBase {
   type=MessageType.file
   attachment: FileAttachment;
   author: User;
