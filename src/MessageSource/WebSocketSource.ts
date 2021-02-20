@@ -3,26 +3,35 @@ import { MessageSource } from '../types'
 import WebSocket from 'ws'
 import { KaiheilaBot } from '..'
 import { inflate, InputType } from 'zlib'
-import { KHEventPacket, KHHelloPacket, KHOpcode, KHPacket, KHPingPacket, KHReconnectPacket } from '../types/kaiheila/packet'
+import {
+  KHEventPacket,
+  KHHelloPacket,
+  KHOpcode,
+  KHPacket,
+  KHPingPacket,
+  KHReconnectPacket
+} from '../types/kaiheila/packet'
 import { URL } from 'url'
+
 export default class WebSocketSource extends EventEmitter implements MessageSource {
   type = 'websocket'
   private self: KaiheilaBot
   socket?: WebSocket
   private compress: boolean
-  private helloTimeout: any;
+  private helloTimeout: any
   /**
    * -1 错误 0 未连接 1 拉取gateway 2 连接gateway 3 已连接gateway 4 已连接 5 心跳超时
    */
-  private stage=0;
-  private retryTimes=0;
-  private url?: string;
+  private stage = 0
+  private retryTimes = 0
+  private url?: string
   sessionId: string | undefined
   heartbeatInterval: any
-  private sn:number=0
+  private sn: number = 0
   heartbeatTimeout: any
-  private buffer:KHEventPacket[]=[]
-  constructor (self:KaiheilaBot, compress:boolean = true) {
+  private buffer: KHEventPacket[] = []
+
+  constructor (self: KaiheilaBot, compress: boolean = true) {
     super()
     this.self = self
     this.compress = compress
@@ -44,8 +53,8 @@ export default class WebSocketSource extends EventEmitter implements MessageSour
     }
   }
 
-  private async dataHandler (data:Buffer|string) {
-    let packet:KHPacket
+  private async dataHandler (data: Buffer | string) {
+    let packet: KHPacket
     if (this.compress && Buffer.isBuffer(data)) {
       packet = JSON.parse((await inflatePromise(data)).toString())
     } else {
@@ -54,7 +63,7 @@ export default class WebSocketSource extends EventEmitter implements MessageSour
     this.onData(packet)
   }
 
-  private onData (packet:KHPacket) {
+  private onData (packet: KHPacket) {
     switch (packet.s) {
       case KHOpcode.HELLO:
         this.handleHelloPacket(packet)
@@ -114,7 +123,7 @@ export default class WebSocketSource extends EventEmitter implements MessageSour
       this.socket = new WebSocket(this.url)
       // @ts-ignore
       this.socket.id = Date.now()
-      this.socket.on('message', function (data:any) {
+      this.socket.on('message', function (data: any) {
         if (self.socket !== this) {
           this.close()
           return
@@ -128,7 +137,7 @@ export default class WebSocketSource extends EventEmitter implements MessageSour
         }
         self.onOpen()
       })
-      this.socket.on('error', function (error:Error) {
+      this.socket.on('error', function (error: Error) {
         if (self.socket !== this) {
           return
         }
@@ -209,8 +218,6 @@ export default class WebSocketSource extends EventEmitter implements MessageSour
         this.stage = 4
         break
       case 4:
-        // eslint-disable-next-line no-debugger
-        debugger
         console.error('Wrong next Stage')
         break
       case 5:
@@ -223,7 +230,7 @@ export default class WebSocketSource extends EventEmitter implements MessageSour
   }
 
   // eslint-disable-next-line node/handle-callback-err
-  private async retry (error?:Error) {
+  private async retry (error?: Error) {
     this.retryTimes++
     switch (this.stage) {
       case 0:
@@ -314,7 +321,7 @@ export default class WebSocketSource extends EventEmitter implements MessageSour
     }
   }
 
-  private handleHelloPacket (packet :KHHelloPacket) {
+  private handleHelloPacket (packet: KHHelloPacket) {
     if (this.helloTimeout) {
       clearTimeout(this.helloTimeout)
       this.helloTimeout = null
@@ -409,7 +416,7 @@ export default class WebSocketSource extends EventEmitter implements MessageSour
   }
 }
 
-function inflatePromise (data: InputType):Promise<Buffer> {
+function inflatePromise (data: InputType): Promise<Buffer> {
   return new Promise((resolve, reject) => {
     inflate(data, (error, result) => {
       if (error) {
@@ -421,7 +428,7 @@ function inflatePromise (data: InputType):Promise<Buffer> {
   })
 }
 
-function getRetryDelay (factor:number, times:number, min:number, max:number) {
+function getRetryDelay (factor: number, times: number, min: number, max: number) {
   return Math.min(min * Math.pow(factor, Math.max(times - 1, 0)), max)
 }
 
@@ -429,7 +436,7 @@ function getRetryDelay (factor:number, times:number, min:number, max:number) {
  * 等待指定时间
  * @param time 秒数
  */
-function wait (time:number) {
+function wait (time: number) {
   return new Promise((resolve) => {
     setTimeout(resolve, time * 1000)
   })

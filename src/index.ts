@@ -5,28 +5,43 @@ import FormData, { Stream } from 'form-data'
 
 import { KHMessage, KHSystemMessage } from './types/kaiheila/kaiheila.type'
 import { KHPacket } from './types/kaiheila/packet'
-import { zeroPadding } from './utils'
-import { AudioMessage, FileMesage as FileMessage, ImageMessage, KMarkDownMessage, MessageSource, MessageType, TextMessage, VideoMessage } from './types'
+import {
+  AudioMessage,
+  FileMesage as FileMessage,
+  ImageMessage,
+  KMarkDownMessage,
+  MessageSource,
+  MessageType,
+  TextMessage,
+  VideoMessage
+} from './types'
 import WebhookSource from './MessageSource/WebhookSource'
-import { KHGetGatewayResponse, KHAPIResponse, KHGetCurrentUserInfoResponse, KHGrantUserRoleResponse, KHRole } from './types/kaiheila/api'
+import {
+  KHGetGatewayResponse,
+  KHAPIResponse,
+  KHGetCurrentUserInfoResponse,
+  KHGrantUserRoleResponse
+} from './types/kaiheila/api'
 import RequestError from './error/RequestError'
 import { CurrentUserInfo, GetGatewayResponse, UserRoleResponse } from './types/api'
 import WebSocketSource from './MessageSource/WebSocketSource'
 import { Role } from './types/types'
+import { GuildAPI } from './api/guild'
+import { KHRole } from './types/kaiheila/types'
 
-export interface BotConfig{
-  mode: 'webhook'|'websocket'|'pc';
+export interface BotConfig {
+  mode: 'webhook' | 'websocket' | 'pc';
   port?: number;
   key?: string;
-  token:string;
+  token: string;
   /**
    * 校验码，需要和
    */
-  verifyToken?:string;
+  verifyToken?: string;
   /**
    * cookie 客户端模拟模式必填。
    */
-  cookies?:string;
+  cookies?: string;
   /**
    * 是否忽略解密错误的消息
    * 也不会产生error事件，会直接next
@@ -42,34 +57,40 @@ function DefaultConfig () {
     ignoreDecryptError: true
   }
 }
+
 export interface BotEventEmitter {
   /**
    * 获取原始事件，challenge已被剔除
    */
-  on(event: 'rawEvent', listener: (event:KHMessage) => void): this;
+  on (event: 'rawEvent', listener: (event: KHMessage) => void): this;
+
   /**
    * 系统事件，目前还没有，占坑，勿用
    */
-  on(event: 'systemMessage', listener: (event:KHSystemMessage) => void): this;
+  on (event: 'systemMessage', listener: (event: KHSystemMessage) => void): this;
+
   /**
    * 注册监听所有处理过的事件
    */
-  on(event: 'message', listener: (event:TextMessage|ImageMessage|VideoMessage|FileMessage|AudioMessage|KMarkDownMessage) => void): this;
+  on (event: 'message', listener: (event: TextMessage | ImageMessage | VideoMessage | FileMessage | AudioMessage | KMarkDownMessage) => void): this;
+
   /**
    * 注册监听未知的事件
    */
-  on(event: 'unknownEvent', listener: (event:KHMessage) => void): this;
+  on (event: 'unknownEvent', listener: (event: KHMessage) => void): this;
 }
 
 export class KaiheilaBot extends EventEmitter {
-  config:BotConfig
+  config: BotConfig
   axios: AxiosInstance
-  messageSource:MessageSource
+  messageSource: MessageSource
+  guildAPI: GuildAPI
+
   /**
    * 开黑啦机器人实例
    * @param config 设置
    */
-  constructor (config:BotConfig) {
+  constructor (config: BotConfig) {
     super()
     this.config = DefaultConfig() as BotConfig
     Object.assign(this.config, config)
@@ -92,6 +113,7 @@ export class KaiheilaBot extends EventEmitter {
       }
     })
     // }
+    this.guildAPI = new GuildAPI(this)
     switch (this.config.mode) {
       case 'websocket':
         this.messageSource = new WebSocketSource(this)
@@ -99,16 +121,16 @@ export class KaiheilaBot extends EventEmitter {
         break
       default:
         this.messageSource = new WebhookSource(config as {
-          key?:string,
-          port:number,
-          verifyToken?:string
+          key?: string,
+          port: number,
+          verifyToken?: string
         })
         this.messageSource.on('message', this.handleMessage.bind(this))
         break
     }
   }
 
-  private handleMessage (eventRequest:KHPacket) {
+  private handleMessage (eventRequest: KHPacket) {
     try {
       this.emit('rawEvent', cloneDeep(eventRequest.d))
     } catch (error) {
@@ -150,7 +172,7 @@ export class KaiheilaBot extends EventEmitter {
    * @param content 消息内容
    * @param quote 回复某条消息的 msgId
    */
-  sendChannelMessage (type:MessageType, channelId:string, content:string, quote?:string) {
+  sendChannelMessage (type: MessageType, channelId: string, content: string, quote?: string) {
     return this.post('v3/channel/message', {
       object_name: type,
       channel_id: channelId,
@@ -164,13 +186,13 @@ export class KaiheilaBot extends EventEmitter {
    * 获取用户亲密度
    * @param userId 用户id
    */
-  getUserIntimacy (userId:string) {
+  getUserIntimacy (userId: string) {
     return this.get('v3/intimacy/index', {
       user_id: userId
     })
   }
 
-  updateUserIntimacy (userId:string, score?:number, socialInfo?:string, imgId?:number) {
+  updateUserIntimacy (userId: string, score?: number, socialInfo?: string, imgId?: number) {
     return this.post('v3/intimacy/update', {
       user_id: userId,
       score,
@@ -179,7 +201,7 @@ export class KaiheilaBot extends EventEmitter {
     })
   }
 
-  post (url:string, data:any) {
+  post (url: string, data: any) {
     return this.axios.post(url, JSON.stringify(data), {
       headers: {
         'Content-Type': 'application/json'
@@ -187,7 +209,7 @@ export class KaiheilaBot extends EventEmitter {
     })
   }
 
-  get (url:string, params:any) {
+  get (url: string, params: any) {
     return this.axios.get(url, {
       params: new URLSearchParams(params)
     })
@@ -197,7 +219,7 @@ export class KaiheilaBot extends EventEmitter {
    * 拉取机器人所在的所有服务器。
    */
   async getGuildList () {
-    const res = await this.get('v3/guild/index', {})
+    const res = await this.get('v3/guild/list', {})
     return res.data
   }
 
@@ -240,11 +262,14 @@ export class KaiheilaBot extends EventEmitter {
    * @param {string} guildId 服务器ID
    * @param {string} userId 用户ID
    * @param {string|number} roleId 角色ID
-   * @memberof KaiheilaBot
    */
-  async grantUserRole (guildId: string, userId: string, roleId: string|number) {
+  async grantUserRole (guildId: string, userId: string, roleId: string | number) {
     if (typeof roleId === 'string') roleId = parseInt(roleId)
-    const data = (await this.post('v3/guild-role/grant', { guild_id: guildId, user_id: userId, role_id: roleId })).data as KHAPIResponse<KHGrantUserRoleResponse>
+    const data = (await this.post('v3/guild-role/grant', {
+      guild_id: guildId,
+      user_id: userId,
+      role_id: roleId
+    })).data as KHAPIResponse<KHGrantUserRoleResponse>
     if (data.code === 0) {
       return {
         userId: data.data.user_id,
@@ -256,9 +281,13 @@ export class KaiheilaBot extends EventEmitter {
     }
   }
 
-  async revokeUserRole (guildId: string, userId: string, roleId: string|number) {
+  async revokeUserRole (guildId: string, userId: string, roleId: string | number) {
     if (typeof roleId === 'string') roleId = parseInt(roleId)
-    const data = (await this.post('v3/guild-role/revoke', { guild_id: guildId, user_id: userId, role_id: roleId })).data as KHAPIResponse<KHGrantUserRoleResponse>
+    const data = (await this.post('v3/guild-role/revoke', {
+      guild_id: guildId,
+      user_id: userId,
+      role_id: roleId
+    })).data as KHAPIResponse<KHGrantUserRoleResponse>
     if (data.code === 0) {
       return {
         userId: data.data.user_id,
@@ -274,7 +303,7 @@ export class KaiheilaBot extends EventEmitter {
    * 获取服务器角色列表
    * @param guildId 服务器的id
    */
-  async getGuildRolesList (guildId:string) {
+  async getGuildRolesList (guildId: string) {
     const data = (await this.get('v3/guild-role/index', {
       guild_id: guildId
     })).data as KHAPIResponse<KHRole[]>
@@ -296,12 +325,12 @@ export class KaiheilaBot extends EventEmitter {
   }
 
   /**
- * 创建服务器角色
- * @param name 角色名称
- * @param guildId 服务器id
- * @returns 创建的角色
- */
-  async createGuildRole (guildId:string, name?:string) {
+   * 创建服务器角色
+   * @param name 角色名称
+   * @param guildId 服务器id
+   * @returns 创建的角色
+   */
+  async createGuildRole (guildId: string, name?: string) {
     const data = (await this.post('v3/guild-role/create', {
       name,
       guild_id: guildId
@@ -327,7 +356,7 @@ export class KaiheilaBot extends EventEmitter {
    * @param guildId 服务器id
    * @returns 更新后的角色
    */
-  async updateGuildRole (guildId:string, role:Role) {
+  async updateGuildRole (guildId: string, role: Role) {
     const data = (await this.post('v3/guild-role/create', {
       guild_id: guildId,
       name: role.name,
@@ -357,10 +386,10 @@ export class KaiheilaBot extends EventEmitter {
    * @param guildId 服务器id
    * @param roleId 角色id
    */
-  async deleteGuildRole (guildId:string, roleId:string|number) {
+  async deleteGuildRole (guildId: string, roleId: string | number) {
     const data = (await this.post('v3/guild-role/delete', {
       guild_id: guildId,
-      rold_id: roleId
+      role_id: roleId
     })).data as KHAPIResponse<[]>
     if (data.code === 0) {
       return true
@@ -374,12 +403,12 @@ export class KaiheilaBot extends EventEmitter {
    * @param file 文件，看到参数错误时需要在选项中补齐文件相关内容。
    * @param option 选项，参见 [form-data](https://github.com/form-data/form-data)
    */
-  async createAsset (file:Buffer|Stream, option?:FormData.AppendOptions) {
+  async createAsset (file: Buffer | Stream, option?: FormData.AppendOptions) {
     const form = new FormData()
     form.append('file', file, option)
     const data = (await this.axios.post('v3/asset/create', form, {
       headers: form.getHeaders()
-    })).data as KHAPIResponse<{url:string}>
+    })).data as KHAPIResponse<{ url: string }>
     if (data.code === 0) {
       return data.data.url
     } else {
@@ -393,7 +422,7 @@ export class KaiheilaBot extends EventEmitter {
    * @param userId 要修改昵称的目标用户 ID，不传则修改当前登陆用户的昵称
    * @param nickname 昵称，2 - 64 长度，不传则清空昵称
    */
-  async modifyUserNickname (guildId:string, userId?:string, nickname?:string) {
+  async modifyUserNickname (guildId: string, userId?: string, nickname?: string) {
     const data = (await this.post('v3/guild/nickname', {
       guild_id: guildId,
       user_id: userId,

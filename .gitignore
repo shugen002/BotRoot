@@ -4,3 +4,5 @@ ecosystem.config.js
 .vscode
 .env
 dist
+debug.log
+.idea

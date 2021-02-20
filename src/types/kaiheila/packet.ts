@@ -28,13 +28,14 @@ export interface KHPacket {
  * | 40102 | token验证失败 | |
  * | 40103 | token过期 | 需要重新连接 |
  */
-export interface KHHelloPacket{
+export interface KHHelloPacket {
   s: KHOpcode,
   d: {
     code: 0 | 40100 | 40101 | 40102 | 40103,
     sessionId?: string
   }
 }
+
 /**
  * 信令[0] EVENT
  *
@@ -56,7 +57,7 @@ export interface KHHelloPacket{
  * 4. 客户端需要存储当前已处理成功的最大的 `sn`, 待心跳ping时回传服务端, 如果服务端发现当前客户端最新处理成功的消息 `sn` 落后于最新消息 (丢包等异常情况), 服务端将会按照客户端指定的 `sn` 将之后所有最新的消息重传给客户端.
  * 5. 消息内容与webhook保持一致
  */
-export interface KHEventPacket<T = any>{
+export interface KHEventPacket<T = any> {
   s: KHOpcode,
   d: T,
   sn: number
@@ -75,7 +76,7 @@ export interface KHEventPacket<T = any>{
  * | ---- | --------------------------------- | ---- | ---- |
  * | sn   | 客户端目前收到的最新的消息 **sn** | number | Y    |
  */
-export interface KHPingPacket{
+export interface KHPingPacket {
   s: KHOpcode,
   /**
    * | 参数 | 描述                              | 类型 | 必传 |
@@ -114,7 +115,7 @@ export interface KHPongPacket {
  * | 40108        | 无效的 `sn` ,  或 `sn` 已经不存在 (resume 失败, PING的 `sn` 无效) |
  */
 export interface KHReconnectPacket {
-  s:KHOpcode,
+  s: KHOpcode,
   d: {
     /**
      * | 状态码 | 描述                                    |

@@ -1,58 +1,59 @@
-export interface GetGatewayResponse{
+export interface GetGatewayResponse {
   url: string
 }
-export interface CurrentUserInfo{
+
+export interface CurrentUserInfo {
   /**
    * 用户的id
    */
-  id:string,
+  id: string,
   /**
    * 用户的名称
    */
-  username:string,
+  username: string,
   /**
    * 用户名的认证数字，用户名正常为：user_name#identify_num
    */
-  identifyNum:string,
+  identifyNum: string,
   /**
    * 当前是否在线
    */
-  online:boolean,
+  online: boolean,
   /**
    * 用户的状态, 0代表正常，10代表被封禁
    */
-  status:number,
+  status: number,
   /**
    * 用户的头像的url地址
    */
-  avatar:string,
+  avatar: string,
   /**
    * 用户是否为机器人
    */
-  bot:boolean,
+  bot: boolean,
   /**
    * 是否手机号已验证
    */
-  mobileVerified:boolean,
+  mobileVerified: boolean,
   /**
    * 是否为官方账号
    */
-  system:boolean,
+  system: boolean,
   /**
    * 手机区号,如中国为86
    */
-  mobilePrefix:string,
+  mobilePrefix: string,
   /**
    * 用户手机号，带掩码
    */
-  mobile:string,
+  mobile: string,
   /**
    * 当前邀请注册的人数
    */
-  invitedCount:number
+  invitedCount: number
 }
 
-export interface UserRoleResponse{
+export interface UserRoleResponse {
   /**
    * 用户ID
    */
@@ -66,3 +67,4 @@ export interface UserRoleResponse{
    */
   roles: number[]
 }
+
