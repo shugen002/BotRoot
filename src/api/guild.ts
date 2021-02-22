@@ -12,7 +12,7 @@ export class GuildAPI {
     this.self = self
   }
 
-  async getGuildList () {
+  async list () {
     const data = (await this.self.get('v3/guild/list', {})).data as KHAPIResponse<KHGuild[]>
     if (data.code === 0) {
       return data.data.map((e) => {
@@ -50,7 +50,7 @@ export class GuildAPI {
    * @param pageSize 每页数据数量
    * @return 用户列表
    */
-  async getGuildUserList (guildId: string, channelId?: string, search?: string, roleId?: number, mobileVerified?: boolean, activeTime?: boolean, joinedAt?: boolean, page?: number, pageSize?: number) {
+  async userList (guildId: string, channelId?: string, search?: string, roleId?: number, mobileVerified?: boolean, activeTime?: boolean, joinedAt?: boolean, page?: number, pageSize?: number) {
     const data = (await this.self.get('v3/guild/user-list', {
       guild_id: guildId,
       channel_id: channelId,
@@ -65,7 +65,11 @@ export class GuildAPI {
     if (data.code === 0) {
       return {
         items: data.data.items.map((e) => {
-          return {} as User
+          return {
+            id: e.id,
+            username: e.username
+          // todo
+          }
         })
       }
     } else {
@@ -73,14 +77,39 @@ export class GuildAPI {
     }
   }
 
-  async getGuildUserListWithFilter (guildId:string, channelId:string, filterOption:{
-    search:string,
-    roleId: number,
-    mobileVerified:boolean
-  }, orderOption:{
-    activeTime:boolean,
-    joinedAt:boolean
-  }) {
+  async nickname (guildId:string, nickname?:string, userId?:string) {
+    const data = (await this.self.post('v3/guild/nickname', {
+      guild_id: guildId,
+      nickname,
+      user_id: userId
+    })).data as KHAPIResponse<[]>
+    if (data.code === 0) {
+      return true
+    } else {
+      throw new RequestError(data.code, data.message)
+    }
+  }
 
+  async leave (guildId:string) {
+    const data = (await this.self.post('v3/guild/leave', {
+      guild_id: guildId
+    })).data as KHAPIResponse<[]>
+    if (data.code === 0) {
+      return true
+    } else {
+      throw new RequestError(data.code, data.message)
+    }
+  }
+
+  async kickout (guildId:string, targetId:string) {
+    const data = (await this.self.post('v3/guild/kickout', {
+      guild_id: guildId,
+      target_id: targetId
+    })).data as KHAPIResponse<[]>
+    if (data.code === 0) {
+      return true
+    } else {
+      throw new RequestError(data.code, data.message)
+    }
   }
 }

@@ -26,8 +26,8 @@ import RequestError from './error/RequestError'
 import { CurrentUserInfo, GetGatewayResponse, UserRoleResponse } from './types/api'
 import WebSocketSource from './MessageSource/WebSocketSource'
 import { Role } from './types/types'
-import { GuildAPI } from './api/guild'
 import { KHRole } from './types/kaiheila/types'
+import { API } from './api'
 
 export interface BotConfig {
   mode: 'webhook' | 'websocket' | 'pc';
@@ -84,7 +84,7 @@ export class KaiheilaBot extends EventEmitter {
   config: BotConfig
   axios: AxiosInstance
   messageSource: MessageSource
-  guildAPI: GuildAPI
+  API: API
 
   /**
    * 开黑啦机器人实例
@@ -113,7 +113,7 @@ export class KaiheilaBot extends EventEmitter {
       }
     })
     // }
-    this.guildAPI = new GuildAPI(this)
+    this.API = new API(this)
     switch (this.config.mode) {
       case 'websocket':
         this.messageSource = new WebSocketSource(this)

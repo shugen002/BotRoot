@@ -31,5 +31,14 @@ export interface KHRole {
 }
 
 export interface KHUser {
-
+  id: string
+  username: string
+  avatar: string
+  online: string
+  nickname: string
+  joined_at: number
+  active_time: number
+  roles: any[]
+  is_master: boolean
+  abbr: string
 }
