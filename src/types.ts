@@ -12,11 +12,11 @@ import {
   KHFileMessage,
   KHAudioAttachment,
   KHKMarkDownMessage,
-  KHAudioMessage
+  KHAudioMessage,
 } from './types/kaiheila/kaiheila.type'
 import { KHPacket } from './types/kaiheila/packet'
 
-function defaultUser () {
+function defaultUser() {
   return {
     username: '',
     identify_num: '0',
@@ -25,7 +25,7 @@ function defaultUser () {
     nickname: '',
     roles: [],
     bot: false,
-    online: true
+    online: true,
   }
 }
 
@@ -93,7 +93,7 @@ export class User {
    */
   online: boolean
 
-  constructor (rawAuthor: KHAuthor = defaultUser()) {
+  constructor(rawAuthor: KHAuthor = defaultUser()) {
     const author = defaultUser()
     Object.assign(author, rawAuthor)
     this.identifyNum = author.identify_num
@@ -119,7 +119,7 @@ export class MessageBase {
   channelType: string
   authorId: string
 
-  constructor (message: KHEventBase, reply = false) {
+  constructor(message: KHEventBase, reply = false) {
     this.type = message.type
     this.channelType = message.channel_type
     this.channelId = message.target_id
@@ -142,7 +142,7 @@ export class Attachment {
   type: string
   url: string
 
-  constructor (attachment: KHAttachment) {
+  constructor(attachment: KHAttachment) {
     this.name = attachment.name
     this.type = attachment.type
     this.url = attachment.url
@@ -157,13 +157,13 @@ export class TextMessage extends MessageBase {
   code: string = ''
   content: string
   mention: {
-    user: string[],
-    roles: string[],
-    all: boolean,
+    user: string[]
+    roles: string[]
+    all: boolean
     here: boolean
   }
 
-  constructor (message: KHTextMessage, reply = false) {
+  constructor(message: KHTextMessage, reply = false) {
     super(message, reply)
     this.content = message.content
     if (reply) {
@@ -174,7 +174,7 @@ export class TextMessage extends MessageBase {
         user: message.mention,
         roles: message.mention_roles,
         all: message.mention_all,
-        here: message.mention_here
+        here: message.mention_here,
       }
     } else {
       this.channelName = message.extra.channel_name
@@ -184,7 +184,7 @@ export class TextMessage extends MessageBase {
         user: message.extra.mention,
         roles: message.extra.mention_roles,
         all: message.extra.mention_all,
-        here: message.extra.mention_here
+        here: message.extra.mention_here,
       }
     }
 
@@ -209,7 +209,7 @@ export class ImageMessage extends MessageBase {
   author: User
   attachment: ImageAttachment
 
-  constructor (message: KHImageMessage) {
+  constructor(message: KHImageMessage) {
     super(message)
     this.content = message.content
     this.code = message.extra.code
@@ -226,7 +226,7 @@ export class VideoAttachment extends Attachment {
   width: number
   duration: number
 
-  constructor (attachment: KHVideoAttachment) {
+  constructor(attachment: KHVideoAttachment) {
     super(attachment)
     this.size = attachment.size
     this.fileType = attachment.file_type
@@ -241,7 +241,7 @@ export class VideoMessage extends MessageBase {
   attachment: VideoAttachment
   author: User
 
-  constructor (message: KHVideoMessage) {
+  constructor(message: KHVideoMessage) {
     super(message)
     this.author = new User(message.extra.author)
     this.attachment = new VideoAttachment(message.extra.attachments)
@@ -253,19 +253,19 @@ export class FileAttachment extends Attachment {
   fileType: string
   size: number
 
-  constructor (attchement: KHFileAttachment) {
+  constructor(attchement: KHFileAttachment) {
     super(attchement)
     this.fileType = attchement.file_type
     this.size = attchement.size
   }
 }
 
-export class FileMesage extends MessageBase {
+export class FileMessage extends MessageBase {
   type = MessageType.file
   attachment: FileAttachment
   author: User
 
-  constructor (message: KHFileMessage) {
+  constructor(message: KHFileMessage) {
     super(message)
     this.author = new User(message.extra.author)
     this.attachment = new FileAttachment(message.extra.attachments)
@@ -284,14 +284,14 @@ export class AudioAttachment {
   duration: number
   name: string
 
-  constructor (attachment: KHAudioAttachment) {
+  constructor(attachment: KHAudioAttachment) {
     this.voice = attachment.voice
     this.mimeType = attachment.mime_type
     this.duration = attachment.duration
     this.name = 'audio'
   }
 
-  get url () {
+  get url() {
     return this.voice
   }
 }
@@ -301,7 +301,7 @@ export class AudioMessage extends MessageBase {
   attachment: AudioAttachment
   author: User
 
-  constructor (message: KHAudioMessage) {
+  constructor(message: KHAudioMessage) {
     super(message)
     this.author = new User(message.extra.author)
     this.attachment = new AudioAttachment(message.extra.attachments)
@@ -311,12 +311,18 @@ export class AudioMessage extends MessageBase {
 export class KMarkDownMessage extends MessageBase {
   type = MessageType.kmarkdown
   author: User
-  mention: { user: string[]; roles: string[]; all: boolean; here: boolean; channels: string[]; }
+  mention: {
+    user: string[]
+    roles: string[]
+    all: boolean
+    here: boolean
+    channels: string[]
+  }
   channelName: string
   content: string
   code: string
 
-  constructor (message: KHKMarkDownMessage) {
+  constructor(message: KHKMarkDownMessage) {
     super(message)
     this.content = message.content
     this.channelName = message.extra.channel_name
@@ -327,7 +333,7 @@ export class KMarkDownMessage extends MessageBase {
       roles: message.extra.mention_roles,
       all: message.extra.mention_all,
       here: message.extra.mention_here,
-      channels: message.extra.nav_channels
+      channels: message.extra.nav_channels,
     }
   }
 }
@@ -335,7 +341,7 @@ export class KMarkDownMessage extends MessageBase {
 export interface MessageSource extends EventEmitter {
   type: string
 
-  on (event: 'message', listener: (eventRequest: KHPacket) => void): this;
+  on(event: 'message', listener: (eventRequest: KHPacket) => void): this
 
-  connect (): Promise<boolean>;
+  connect(): Promise<boolean>
 }

@@ -49,9 +49,9 @@ export interface KHSystemMessage extends KHEventBase {
   type: 255
   author_id: '1'
   extra: {
-    type: string,
+    type: string
     body: any
-  },
+  }
   nonce: any
 }
 
@@ -151,7 +151,7 @@ export interface KHAudioMessage extends KHEventBase {
   type: 8
   extra: {
     type: 8
-    author: KHAuthor,
+    author: KHAuthor
     attachments: KHAudioAttachment
   }
 }
@@ -159,7 +159,7 @@ export interface KHAudioMessage extends KHEventBase {
 export interface KHKMarkDownMessage extends KHEventBase {
   type: 9
   extra: {
-    type: 9,
+    type: 9
     guild_id: string
     channel_name: string
     mention: string[]
@@ -200,11 +200,9 @@ export interface KaiheilaEncryptPacket {
 
 export type KaiheilaWebhookRequest = KaiheilaEncryptPacket | KHPacket
 
-export interface KHemoji {
-}
+export interface KHemoji {}
 
-export interface KHChannel {
-}
+export interface KHChannel {}
 
 export interface KHGuild {
   /**
@@ -255,7 +253,7 @@ export interface KHGuild {
   /**
    * 服务器主的id
    */
-  master_id: string,
+  master_id: string
   /**
    * 服务器默认使用语音区域
    */

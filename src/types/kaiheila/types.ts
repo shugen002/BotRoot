@@ -40,5 +40,6 @@ export interface KHUser {
   active_time: number
   roles: any[]
   is_master: boolean
-  abbr: string
+  identify_num?: string
+  abbr?: string
 }

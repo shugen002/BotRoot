@@ -1,37 +1,50 @@
 import { KaiheilaBot } from '..'
 import RequestError from '../error/RequestError'
-import { KHAPIResponse, KHGuildUserListResponse } from '../types/kaiheila/api'
+import {
+  KHAPIMultiPage,
+  KHAPIResponse,
+  KHGuildUserListResponse,
+} from '../types/kaiheila/api'
 import { KHGuild } from '../types/kaiheila/kaiheila.type'
 import { Guild } from '../types/types'
-import { User } from '../types'
 
 export class GuildAPI {
-  self: KaiheilaBot
+  private self: KaiheilaBot
 
-  constructor (self: KaiheilaBot) {
+  constructor(self: KaiheilaBot) {
     this.self = self
   }
 
-  async list () {
-    const data = (await this.self.get('v3/guild/list', {})).data as KHAPIResponse<KHGuild[]>
+  async list() {
+    const data = (await this.self.get('v3/guild/list', {}))
+      .data as KHAPIResponse<KHAPIMultiPage<KHGuild>>
     if (data.code === 0) {
-      return data.data.map((e) => {
-        return {
-          id: e.id,
-          name: e.name,
-          topic: e.topic,
-          masterId: e.master_id,
-          isMaster: e.is_master,
-          icon: e.icon,
-          inviteEnabled: e.invite_enabled,
-          notifyType: e.notify_type,
-          region: e.region,
-          enableOpen: e.enable_open,
-          openId: e.open_id,
-          defaultChannelId: e.default_channel_id,
-          welcomeChannelId: e.welcome_channel_id
-        } as Guild
-      }) as Guild[]
+      return {
+        items: data.data.items.map((e) => {
+          return {
+            id: e.id,
+            name: e.name,
+            topic: e.topic,
+            masterId: e.master_id,
+            isMaster: e.is_master,
+            icon: e.icon,
+            inviteEnabled: e.invite_enabled,
+            notifyType: e.notify_type,
+            region: e.region,
+            enableOpen: e.enable_open,
+            openId: e.open_id,
+            defaultChannelId: e.default_channel_id,
+            welcomeChannelId: e.welcome_channel_id,
+          } as Guild
+        }) as Guild[],
+        meta: {
+          page: data.data.meta.page,
+          totalPage: data.data.meta.page_total,
+          pageSize: data.data.meta.page_size,
+          total: data.data.meta.total,
+        },
+        sort: data.data.sort,
+      }
     } else {
       throw new RequestError(data.code, data.message)
     }
@@ -50,39 +63,60 @@ export class GuildAPI {
    * @param pageSize 每页数据数量
    * @return 用户列表
    */
-  async userList (guildId: string, channelId?: string, search?: string, roleId?: number, mobileVerified?: boolean, activeTime?: boolean, joinedAt?: boolean, page?: number, pageSize?: number) {
-    const data = (await this.self.get('v3/guild/user-list', {
-      guild_id: guildId,
-      channel_id: channelId,
-      search: search,
-      role_id: roleId,
-      mobile_verified: mobileVerified,
-      active_time: activeTime,
-      joined_at: joinedAt,
-      page: page,
-      page_size: pageSize
-    })).data as KHAPIResponse<KHGuildUserListResponse>
+  async userList(
+    guildId: string,
+    channelId?: string,
+    search?: string,
+    roleId?: number,
+    mobileVerified?: boolean,
+    activeTime?: boolean,
+    joinedAt?: boolean,
+    page?: number,
+    pageSize?: number
+  ) {
+    const data = (
+      await this.self.get('v3/guild/user-list', {
+        guild_id: guildId,
+        channel_id: channelId,
+        search: search,
+        role_id: roleId,
+        mobile_verified: mobileVerified,
+        active_time: activeTime,
+        joined_at: joinedAt,
+        page: page,
+        page_size: pageSize,
+      })
+    ).data as KHAPIResponse<KHGuildUserListResponse>
     if (data.code === 0) {
       return {
         items: data.data.items.map((e) => {
           return {
             id: e.id,
-            username: e.username
-          // todo
+            username: e.username,
+            avatar: e.avatar,
+            online: e.online,
+            nickname: e.nickname,
+            joinedAt: e.joined_at,
+            activeTime: e.active_time,
+            roles: e.roles,
+            isMaster: e.is_master,
+            identitfyNum: e.abbr || e.identify_num,
           }
-        })
+        }),
       }
     } else {
       throw new RequestError(data.code, data.message)
     }
   }
 
-  async nickname (guildId:string, nickname?:string, userId?:string) {
-    const data = (await this.self.post('v3/guild/nickname', {
-      guild_id: guildId,
-      nickname,
-      user_id: userId
-    })).data as KHAPIResponse<[]>
+  async nickname(guildId: string, nickname?: string, userId?: string) {
+    const data = (
+      await this.self.post('v3/guild/nickname', {
+        guild_id: guildId,
+        nickname,
+        user_id: userId,
+      })
+    ).data as KHAPIResponse<[]>
     if (data.code === 0) {
       return true
     } else {
@@ -90,10 +124,12 @@ export class GuildAPI {
     }
   }
 
-  async leave (guildId:string) {
-    const data = (await this.self.post('v3/guild/leave', {
-      guild_id: guildId
-    })).data as KHAPIResponse<[]>
+  async leave(guildId: string) {
+    const data = (
+      await this.self.post('v3/guild/leave', {
+        guild_id: guildId,
+      })
+    ).data as KHAPIResponse<[]>
     if (data.code === 0) {
       return true
     } else {
@@ -101,11 +137,13 @@ export class GuildAPI {
     }
   }
 
-  async kickout (guildId:string, targetId:string) {
-    const data = (await this.self.post('v3/guild/kickout', {
-      guild_id: guildId,
-      target_id: targetId
-    })).data as KHAPIResponse<[]>
+  async kickout(guildId: string, targetId: string) {
+    const data = (
+      await this.self.post('v3/guild/kickout', {
+        guild_id: guildId,
+        target_id: targetId,
+      })
+    ).data as KHAPIResponse<[]>
     if (data.code === 0) {
       return true
     } else {

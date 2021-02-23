@@ -1,20 +1,16 @@
 module.exports = {
+  root: true,
   env: {
-    es2021: true,
-    node: true
+    node: true,
+    es2020: true,
   },
-  extends: [
-    'standard'
-  ],
   parser: '@typescript-eslint/parser',
-  parserOptions: {
-    ecmaVersion: 12,
-    sourceType: 'module'
-  },
-  plugins: [
-    '@typescript-eslint'
+  plugins: ['prettier', '@typescript-eslint'],
+  extends: [
+    'eslint:recommended',
+    'plugin:@typescript-eslint/recommended',
+    'prettier',
+    'plugin:prettier/recommended',
+    'prettier/@typescript-eslint',
   ],
-  rules: {
-    'no-unused-vars': 0
-  }
 }

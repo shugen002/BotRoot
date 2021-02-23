@@ -13,7 +13,9 @@ interface snMap {
   [key: number]: number
 }
 
-export default class WebhookSource extends EventEmitter implements MessageSource {
+export default class WebhookSource
+  extends EventEmitter
+  implements MessageSource {
   type = 'webhook'
   private snMap: snMap = {}
   private key?: Buffer
@@ -23,13 +25,15 @@ export default class WebhookSource extends EventEmitter implements MessageSource
   public httpServer?: Koa<Koa.DefaultState, Koa.DefaultContext>
   connect: () => Promise<boolean>
 
-  constructor (config: {
-    key?: string,
-    port: number,
-    verifyToken?: string
-  } = {
-    port: 8600
-  }) {
+  constructor(
+    config: {
+      key?: string
+      port: number
+      verifyToken?: string
+    } = {
+      port: 8600,
+    }
+  ) {
     super()
     if (config.key) {
       this.key = zeroPadding(config.key || '')
@@ -47,11 +51,14 @@ export default class WebhookSource extends EventEmitter implements MessageSource
    * 获取中间件
    * 可用于共用Koa实例。
    */
-  getMiddleware () {
+  getMiddleware() {
     return this.route.bind(this)
   }
 
-  private async route (context: Koa.ParameterizedContext<Koa.DefaultState, Koa.DefaultContext>, next: Koa.Next) {
+  private async route(
+    context: Koa.ParameterizedContext<Koa.DefaultState, Koa.DefaultContext>,
+    next: Koa.Next
+  ) {
     const request = context.request.body
     let eventRequest: KHPacket
     if (this.key) {
@@ -62,7 +69,10 @@ export default class WebhookSource extends EventEmitter implements MessageSource
           return next()
         } else {
           this.emit('error', error)
-          context.throw('Not Kaiheila Request or bad encryption or unencrypted request', 500)
+          context.throw(
+            'Not Kaiheila Request or bad encryption or unencrypted request',
+            500
+          )
         }
       }
     } else {
@@ -85,16 +95,22 @@ export default class WebhookSource extends EventEmitter implements MessageSource
    * 解密
    * @param request 请求体
    */
-  private decryptRequest (request: any) {
+  private decryptRequest(request: any) {
     if (typeof request.encrypt === 'string') {
       if (!this.key) {
         throw new FailDecryptError('No Key')
       }
       const encrypted = Buffer.from(request.encrypt, 'base64')
       const iv = encrypted.subarray(0, 16)
-      const encryptedData = Buffer.from(encrypted.subarray(16, encrypted.length).toString(), 'base64')
+      const encryptedData = Buffer.from(
+        encrypted.subarray(16, encrypted.length).toString(),
+        'base64'
+      )
       const decipher = createDecipheriv('aes-256-cbc', this.key, iv)
-      const decrypt = Buffer.concat([decipher.update(encryptedData), decipher.final()])
+      const decrypt = Buffer.concat([
+        decipher.update(encryptedData),
+        decipher.final(),
+      ])
       const data = JSON.parse(decrypt.toString())
       return data as KHPacket
     } else {
@@ -105,28 +121,44 @@ export default class WebhookSource extends EventEmitter implements MessageSource
     }
   }
 
-  private verifyRequest (body: any) {
-    if (typeof body !== 'object' || typeof body.s !== 'number' || typeof body.d !== 'object') {
+  private verifyRequest(body: any) {
+    if (
+      typeof body !== 'object' ||
+      typeof body.s !== 'number' ||
+      typeof body.d !== 'object'
+    ) {
       return false
     }
-    if (typeof this.verifyToken !== 'undefined' && body.d.verify_token !== this.verifyToken) {
+    if (
+      typeof this.verifyToken !== 'undefined' &&
+      body.d.verify_token !== this.verifyToken
+    ) {
       return false
     }
     return true
   }
 
-  private verifySN (body: KHPacket) {
-    if (this.snMap[body.sn as number] && this.snMap[body.sn as number] - Date.now() < 1000 * 600) {
+  private verifySN(body: KHPacket) {
+    if (
+      this.snMap[body.sn as number] &&
+      this.snMap[body.sn as number] - Date.now() < 1000 * 600
+    ) {
       return false
     }
     this.snMap[body.sn as number] = Date.now()
     return true
   }
 
-  private handleChallenge (eventRequest: KHPacket, context: Koa.ParameterizedContext<Koa.DefaultState, Koa.DefaultContext>) {
-    if (eventRequest.d.type === 255 && eventRequest.d.channel_type === 'WEBHOOK_CHALLENGE') {
+  private handleChallenge(
+    eventRequest: KHPacket,
+    context: Koa.ParameterizedContext<Koa.DefaultState, Koa.DefaultContext>
+  ) {
+    if (
+      eventRequest.d.type === 255 &&
+      eventRequest.d.channel_type === 'WEBHOOK_CHALLENGE'
+    ) {
       context.body = {
-        challenge: eventRequest.d.challenge
+        challenge: eventRequest.d.challenge,
       }
       return true
     }
@@ -138,7 +170,7 @@ export default class WebhookSource extends EventEmitter implements MessageSource
    *
    * webhook模式下会在指定端口号启动一个http服务
    */
-  async listen () {
+  async listen() {
     const app = new Koa()
     app.use(bodyParser())
     app.use(this.getMiddleware())

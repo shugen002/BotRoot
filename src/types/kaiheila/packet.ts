@@ -4,7 +4,7 @@ export enum KHOpcode {
   PING = 2,
   PONG = 3,
   RECONNECT = 5,
-  RESUME_ACK = 6
+  RESUME_ACK = 6,
 }
 
 export interface KHPacket {
@@ -29,9 +29,9 @@ export interface KHPacket {
  * | 40103 | token过期 | 需要重新连接 |
  */
 export interface KHHelloPacket {
-  s: KHOpcode,
+  s: KHOpcode
   d: {
-    code: 0 | 40100 | 40101 | 40102 | 40103,
+    code: 0 | 40100 | 40101 | 40102 | 40103
     sessionId?: string
   }
 }
@@ -58,8 +58,8 @@ export interface KHHelloPacket {
  * 5. 消息内容与webhook保持一致
  */
 export interface KHEventPacket<T = any> {
-  s: KHOpcode,
-  d: T,
+  s: KHOpcode
+  d: T
   sn: number
 }
 
@@ -77,7 +77,7 @@ export interface KHEventPacket<T = any> {
  * | sn   | 客户端目前收到的最新的消息 **sn** | number | Y    |
  */
 export interface KHPingPacket {
-  s: KHOpcode,
+  s: KHOpcode
   /**
    * | 参数 | 描述                              | 类型 | 必传 |
    * | ---- | --------------------------------- | ---- | ---- |
@@ -115,7 +115,7 @@ export interface KHPongPacket {
  * | 40108        | 无效的 `sn` ,  或 `sn` 已经不存在 (resume 失败, PING的 `sn` 无效) |
  */
 export interface KHReconnectPacket {
-  s: KHOpcode,
+  s: KHOpcode
   d: {
     /**
      * | 状态码 | 描述                                    |

@@ -9,11 +9,13 @@ import {
   KHOpcode,
   KHPacket,
   KHPingPacket,
-  KHReconnectPacket
+  KHReconnectPacket,
 } from '../types/kaiheila/packet'
 import { URL } from 'url'
 
-export default class WebSocketSource extends EventEmitter implements MessageSource {
+export default class WebSocketSource
+  extends EventEmitter
+  implements MessageSource {
   type = 'websocket'
   private self: KaiheilaBot
   socket?: WebSocket
@@ -31,20 +33,20 @@ export default class WebSocketSource extends EventEmitter implements MessageSour
   heartbeatTimeout: any
   private buffer: KHEventPacket[] = []
 
-  constructor (self: KaiheilaBot, compress: boolean = true) {
+  constructor(self: KaiheilaBot, compress: boolean = true) {
     super()
     this.self = self
     this.compress = compress
   }
 
-  async connect () {
+  async connect() {
     if (this.stage === 0) {
       this.nextStage()
     }
     return true
   }
 
-  private async getGateWay () {
+  private async getGateWay() {
     try {
       this.url = (await this.self.getGateWay(this.compress ? 1 : 0)).url
       this.nextStage()
@@ -53,7 +55,7 @@ export default class WebSocketSource extends EventEmitter implements MessageSour
     }
   }
 
-  private async dataHandler (data: Buffer | string) {
+  private async dataHandler(data: Buffer | string) {
     let packet: KHPacket
     if (this.compress && Buffer.isBuffer(data)) {
       packet = JSON.parse((await inflatePromise(data)).toString())
@@ -63,7 +65,7 @@ export default class WebSocketSource extends EventEmitter implements MessageSour
     this.onData(packet)
   }
 
-  private onData (packet: KHPacket) {
+  private onData(packet: KHPacket) {
     switch (packet.s) {
       case KHOpcode.HELLO:
         this.handleHelloPacket(packet)
@@ -110,11 +112,11 @@ export default class WebSocketSource extends EventEmitter implements MessageSour
     }
   }
 
-  private onOpen () {
+  private onOpen() {
     this.nextStage()
   }
 
-  private connectSocket () {
+  private connectSocket() {
     if (this.url) {
       const self = this
       if (this.sessionId) {
@@ -158,11 +160,16 @@ export default class WebSocketSource extends EventEmitter implements MessageSour
           return
         }
         self.socket = undefined
-        if (self.helloTimeout) self.helloTimeout = clearTimeout(self.helloTimeout)
-        if (self.heartbeatInterval) self.heartbeatInterval = clearInterval(self.heartbeatInterval)
-        if (self.heartbeatTimeout) self.heartbeatTimeout = clearTimeout(self.heartbeatTimeout)
+        if (self.helloTimeout)
+          self.helloTimeout = clearTimeout(self.helloTimeout)
+        if (self.heartbeatInterval)
+          self.heartbeatInterval = clearInterval(self.heartbeatInterval)
+        if (self.heartbeatTimeout)
+          self.heartbeatTimeout = clearTimeout(self.heartbeatTimeout)
         if (self.stage === 3) {
-          self.retry(new Error('close before hello packet ' + code + ' ' + reason))
+          self.retry(
+            new Error('close before hello packet ' + code + ' ' + reason)
+          )
         }
         if (self.stage === 4 || self.stage === 5) {
           self.retry(new Error(code + ' ' + reason))
@@ -171,7 +178,7 @@ export default class WebSocketSource extends EventEmitter implements MessageSour
     }
   }
 
-  private onHelloTimeout () {
+  private onHelloTimeout() {
     if (this.socket) {
       this.socket.close()
       this.socket = undefined
@@ -191,7 +198,7 @@ export default class WebSocketSource extends EventEmitter implements MessageSour
     }
   }
 
-  private nextStage () {
+  private nextStage() {
     switch (this.stage) {
       case 0:
         this.stage = 1
@@ -230,7 +237,7 @@ export default class WebSocketSource extends EventEmitter implements MessageSour
   }
 
   // eslint-disable-next-line node/handle-callback-err
-  private async retry (error?: Error) {
+  private async retry(error?: Error) {
     this.retryTimes++
     switch (this.stage) {
       case 0:
@@ -247,7 +254,10 @@ export default class WebSocketSource extends EventEmitter implements MessageSour
           await wait(getRetryDelay(2, this.retryTimes, 1, 60))
           this.connectSocket()
         } else {
-          console.warn('connect to gateway fail over three times, retrying', error)
+          console.warn(
+            'connect to gateway fail over three times, retrying',
+            error
+          )
           this.stage = 0
           this.nextStage()
         }
@@ -262,9 +272,7 @@ export default class WebSocketSource extends EventEmitter implements MessageSour
           if (this.socket) {
             this.socket.close()
           }
-        } catch (error) {
-
-        }
+        } catch (error) {}
         if (this.helloTimeout) {
           clearTimeout(this.helloTimeout)
           this.helloTimeout = undefined
@@ -292,9 +300,7 @@ export default class WebSocketSource extends EventEmitter implements MessageSour
             if (this.socket) {
               this.socket.close()
             }
-          } catch (error) {
-
-          }
+          } catch (error) {}
           if (this.helloTimeout) {
             clearTimeout(this.helloTimeout)
             this.helloTimeout = undefined
@@ -321,7 +327,7 @@ export default class WebSocketSource extends EventEmitter implements MessageSour
     }
   }
 
-  private handleHelloPacket (packet: KHHelloPacket) {
+  private handleHelloPacket(packet: KHHelloPacket) {
     if (this.helloTimeout) {
       clearTimeout(this.helloTimeout)
       this.helloTimeout = null
@@ -357,7 +363,7 @@ export default class WebSocketSource extends EventEmitter implements MessageSour
     }
   }
 
-  private handleReconnectPacket (packet: KHReconnectPacket) {
+  private handleReconnectPacket(packet: KHReconnectPacket) {
     if (this.heartbeatInterval) {
       clearInterval(this.heartbeatInterval)
       this.heartbeatInterval = undefined
@@ -381,7 +387,7 @@ export default class WebSocketSource extends EventEmitter implements MessageSour
     this.nextStage()
   }
 
-  private startHeartbeat () {
+  private startHeartbeat() {
     if (this.heartbeatInterval) {
       clearInterval(this.heartbeatInterval)
       console.warn('Exist Heartbeat Interval , may happen something unexpected')
@@ -389,13 +395,18 @@ export default class WebSocketSource extends EventEmitter implements MessageSour
     this.heartbeatInterval = setInterval(this.heartbeat.bind(this), 30 * 1000)
   }
 
-  private heartbeat () {
+  private heartbeat() {
     if (this.socket && this.socket.readyState === WebSocket.OPEN) {
-      this.socket.send(JSON.stringify({
-        s: KHOpcode.PING,
-        sn: this.sn
-      } as KHPingPacket))
-      this.heartbeatTimeout = setTimeout(this.onHeartbeatTimeout.bind(this), 6 * 1000)
+      this.socket.send(
+        JSON.stringify({
+          s: KHOpcode.PING,
+          sn: this.sn,
+        } as KHPingPacket)
+      )
+      this.heartbeatTimeout = setTimeout(
+        this.onHeartbeatTimeout.bind(this),
+        6 * 1000
+      )
     } else if (this.stage === 4) {
       clearInterval(this.heartbeatInterval)
       this.heartbeatInterval = undefined
@@ -407,7 +418,7 @@ export default class WebSocketSource extends EventEmitter implements MessageSour
     }
   }
 
-  private onHeartbeatTimeout () {
+  private onHeartbeatTimeout() {
     if (this.socket && this.socket.readyState === this.socket.OPEN) {
       this.retry()
     } else {
@@ -416,7 +427,7 @@ export default class WebSocketSource extends EventEmitter implements MessageSour
   }
 }
 
-function inflatePromise (data: InputType): Promise<Buffer> {
+function inflatePromise(data: InputType): Promise<Buffer> {
   return new Promise((resolve, reject) => {
     inflate(data, (error, result) => {
       if (error) {
@@ -428,7 +439,12 @@ function inflatePromise (data: InputType): Promise<Buffer> {
   })
 }
 
-function getRetryDelay (factor: number, times: number, min: number, max: number) {
+function getRetryDelay(
+  factor: number,
+  times: number,
+  min: number,
+  max: number
+) {
   return Math.min(min * Math.pow(factor, Math.max(times - 1, 0)), max)
 }
 
@@ -436,7 +452,7 @@ function getRetryDelay (factor: number, times: number, min: number, max: number)
  * 等待指定时间
  * @param time 秒数
  */
-function wait (time: number) {
+function wait(time: number) {
   return new Promise((resolve) => {
     setTimeout(resolve, time * 1000)
   })

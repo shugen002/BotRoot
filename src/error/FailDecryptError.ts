@@ -1,3 +1,1 @@
-export default class FailDecryptError extends Error {
-
-}
+export default class FailDecryptError extends Error {}
