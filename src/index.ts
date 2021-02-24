@@ -16,20 +16,11 @@ import {
   VideoMessage,
 } from './types'
 import WebhookSource from './MessageSource/WebhookSource'
-import {
-  KHGetGatewayResponse,
-  KHAPIResponse,
-  KHGetCurrentUserInfoResponse,
-  KHGrantUserRoleResponse,
-} from './types/kaiheila/api'
+import { KHAPIResponse, KHGrantUserRoleResponse } from './types/kaiheila/api'
 import RequestError from './error/RequestError'
-import {
-  CurrentUserInfo,
-  GetGatewayResponse,
-  UserRoleResponse,
-} from './types/api'
+import { UserRoleResponse } from './types/api'
 import WebSocketSource from './MessageSource/WebSocketSource'
-import { Role } from './types/types'
+import { RoleInternal } from './types/internal'
 import { KHRole } from './types/kaiheila/types'
 import { API } from './api'
 import { URLSearchParams } from 'url'
@@ -320,7 +311,7 @@ export class KaiheilaBot extends EventEmitter {
           mentionable: role.mentionable,
           permissions: role.permissions,
         }
-      }) as Role[]
+      }) as RoleInternal[]
     } else {
       throw new RequestError(data.code, data.message)
     }
@@ -348,7 +339,7 @@ export class KaiheilaBot extends EventEmitter {
         hoist: data.data.hoist,
         mentionable: data.data.mentionable,
         permissions: data.data.permissions,
-      } as Role
+      } as RoleInternal
     } else {
       throw new RequestError(data.code, data.message)
     }
@@ -360,7 +351,7 @@ export class KaiheilaBot extends EventEmitter {
    * @param guildId 服务器id
    * @returns 更新后的角色
    */
-  async updateGuildRole(guildId: string, role: Role) {
+  async updateGuildRole(guildId: string, role: RoleInternal) {
     const data = (
       await this.post('v3/guild-role/create', {
         guild_id: guildId,
@@ -381,7 +372,7 @@ export class KaiheilaBot extends EventEmitter {
         hoist: data.data.hoist,
         mentionable: data.data.mentionable,
         permissions: data.data.permissions,
-      } as Role
+      } as RoleInternal
     } else {
       throw new RequestError(data.code, data.message)
     }

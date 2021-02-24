@@ -1,13 +1,17 @@
 import { KaiheilaBot } from '../..'
+import RequestError from '../../error/RequestError'
 import { KHAPIResponse } from '../../types/kaiheila/api'
-import { CurrentUserInfoInternal, KHGetCurrentUserInfoResponse } from './user.types'
+import {
+  CurrentUserInfoInternal,
+  KHGetCurrentUserInfoResponse,
+} from './user.types'
 
 export class UserAPI {
   private self: KaiheilaBot
   constructor(self: KaiheilaBot) {
     this.self = self
   }
-  async getCurrentUserInfo() {
+  async getCurrentUserInfo(): Promise<CurrentUserInfoInternal> {
     const data = (await this.self.get('v3/user/me', {}))
       .data as KHAPIResponse<KHGetCurrentUserInfoResponse>
     if (data.code === 0) {
@@ -28,4 +32,5 @@ export class UserAPI {
     } else {
       throw new RequestError(data.code, data.message)
     }
+  }
 }
