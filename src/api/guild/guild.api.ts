@@ -1,12 +1,13 @@
-import { KaiheilaBot } from '..'
-import RequestError from '../error/RequestError'
+import { KaiheilaBot } from '../..'
+import RequestError from '../../error/RequestError'
+import { transformUser } from '../../helper'
+import { KHAPIResponse } from '../../types/kaiheila/api'
 import {
-  KHAPIMultiPage,
-  KHAPIResponse,
+  GuildListResponseInternal,
+  GuildUserListInternal,
+  KHGuildListResponse,
   KHGuildUserListResponse,
-} from '../types/kaiheila/api'
-import { KHGuild } from '../types/kaiheila/kaiheila.type'
-import { Guild } from '../types/types'
+} from './guild.types'
 
 export class GuildAPI {
   private self: KaiheilaBot
@@ -15,9 +16,12 @@ export class GuildAPI {
     this.self = self
   }
 
-  async list() {
+  /**
+   * 获取当前用户加入的服务器列表
+   */
+  async list(): Promise<GuildListResponseInternal> {
     const data = (await this.self.get('v3/guild/list', {}))
-      .data as KHAPIResponse<KHAPIMultiPage<KHGuild>>
+      .data as KHAPIResponse<KHGuildListResponse>
     if (data.code === 0) {
       return {
         items: data.data.items.map((e) => {
@@ -35,15 +39,14 @@ export class GuildAPI {
             openId: e.open_id,
             defaultChannelId: e.default_channel_id,
             welcomeChannelId: e.welcome_channel_id,
-          } as Guild
-        }) as Guild[],
+          }
+        }),
         meta: {
           page: data.data.meta.page,
-          totalPage: data.data.meta.page_total,
+          pageTotal: data.data.meta.page_total,
           pageSize: data.data.meta.page_size,
           total: data.data.meta.total,
         },
-        sort: data.data.sort,
       }
     } else {
       throw new RequestError(data.code, data.message)
@@ -73,7 +76,7 @@ export class GuildAPI {
     joinedAt?: boolean,
     page?: number,
     pageSize?: number
-  ) {
+  ): Promise<GuildUserListInternal> {
     const data = (
       await this.self.get('v3/guild/user-list', {
         guild_id: guildId,
@@ -90,18 +93,7 @@ export class GuildAPI {
     if (data.code === 0) {
       return {
         items: data.data.items.map((e) => {
-          return {
-            id: e.id,
-            username: e.username,
-            avatar: e.avatar,
-            online: e.online,
-            nickname: e.nickname,
-            joinedAt: e.joined_at,
-            activeTime: e.active_time,
-            roles: e.roles,
-            isMaster: e.is_master,
-            identitfyNum: e.abbr || e.identify_num,
-          }
+          return transformUser(e)
         }),
       }
     } else {
@@ -109,14 +101,24 @@ export class GuildAPI {
     }
   }
 
-  async nickname(guildId: string, nickname?: string, userId?: string) {
+  /**
+   * 修改服务器中用户的昵称
+   * @param guildId 服务器的 ID
+   * @param userId 要修改昵称的目标用户 ID，不传则修改当前登陆用户的昵称
+   * @param nickname 昵称，2 - 64 长度，不传则清空昵称
+   */
+  async nickname(
+    guildId: string,
+    nickname?: string,
+    userId?: string
+  ): Promise<boolean> {
     const data = (
       await this.self.post('v3/guild/nickname', {
         guild_id: guildId,
         nickname,
         user_id: userId,
       })
-    ).data as KHAPIResponse<[]>
+    ).data as KHAPIResponse<never>
     if (data.code === 0) {
       return true
     } else {
@@ -124,12 +126,12 @@ export class GuildAPI {
     }
   }
 
-  async leave(guildId: string) {
+  async leave(guildId: string): Promise<boolean> {
     const data = (
       await this.self.post('v3/guild/leave', {
         guild_id: guildId,
       })
-    ).data as KHAPIResponse<[]>
+    ).data as KHAPIResponse<never>
     if (data.code === 0) {
       return true
     } else {
@@ -137,13 +139,13 @@ export class GuildAPI {
     }
   }
 
-  async kickout(guildId: string, targetId: string) {
+  async kickout(guildId: string, targetId: string): Promise<boolean> {
     const data = (
       await this.self.post('v3/guild/kickout', {
         guild_id: guildId,
         target_id: targetId,
       })
-    ).data as KHAPIResponse<[]>
+    ).data as KHAPIResponse<never>
     if (data.code === 0) {
       return true
     } else {

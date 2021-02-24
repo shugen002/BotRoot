@@ -1,11 +1,10 @@
-import { KaiheilaBot } from '..'
-import RequestError from '../error/RequestError'
-import { KHAPIResponse } from '../types/kaiheila/api'
-
-interface KHGuildMuteListResponse {
-  '1': string[]
-  '2': string[]
-}
+import { KaiheilaBot } from '../..'
+import RequestError from '../../error/RequestError'
+import { KHAPIResponse } from '../../types/kaiheila/api'
+import {
+  GuildMuteListResponseInternal,
+  KHGuildMuteListResponse,
+} from './guildMute.type'
 
 export class GuildMuteAPI {
   private self: KaiheilaBot
@@ -17,7 +16,7 @@ export class GuildMuteAPI {
    * 服务器静音闭麦列表
    * @param guildId 服务器id
    */
-  async list(guildId: string) {
+  async list(guildId: string): Promise<GuildMuteListResponseInternal> {
     const data = (
       await this.self.get('v3/guild-mute/list', {
         guild_id: guildId,
@@ -41,7 +40,11 @@ export class GuildMuteAPI {
    * @param userId 用户id
    * @param type `1`代表麦克风闭麦，`2`代表耳机静音
    */
-  async create(guildId: string, userId: string, type: string | 1 | 2) {
+  async create(
+    guildId: string,
+    userId: string,
+    type: string | 1 | 2
+  ): Promise<boolean> {
     const data = (
       await this.self.post('v3/guild-mute/create', {
         guild_id: guildId,
@@ -62,7 +65,11 @@ export class GuildMuteAPI {
    * @param userId 用户id
    * @param type `1`代表麦克风闭麦，`2`代表耳机静音
    */
-  async delete(guildId: string, userId: string, type: string | 1 | 2) {
+  async delete(
+    guildId: string,
+    userId: string,
+    type: string | 1 | 2
+  ): Promise<boolean> {
     const data = (
       await this.self.post('v3/guild-mute/delete', {
         guild_id: guildId,

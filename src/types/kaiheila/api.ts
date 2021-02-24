@@ -16,73 +16,7 @@ export interface KHAPIMultiPage<KHItemType> {
     page_size: number
     total: number
   }
-  [key: string]: any
-}
-
-export interface KHGetGatewayResponse {
-  url: string
-}
-
-export interface KHGetCurrentUserInfoResponse {
-  /**
-   * 用户的id
-   */
-  id: string
-
-  /**
-   * 用户的名称
-   */
-  username: string
-
-  /**
-   * 用户名的认证数字，用户名正常为：user_name#identify_num
-   */
-  identify_num: string
-
-  /**
-   * 当前是否在线
-   */
-  online: boolean
-
-  /**
-   * 用户的状态, 0代表正常，10代表被封禁
-   */
-  status: number
-
-  /**
-   * 用户的头像的url地址
-   */
-  avatar: string
-
-  /**
-   * 用户是否为机器人
-   */
-  bot: boolean
-
-  /**
-   * 是否手机号已验证
-   */
-  mobile_verified: boolean
-
-  /**
-   * 是否为官方账号
-   */
-  system: boolean
-
-  /**
-   * 手机区号,如中国为86
-   */
-  mobile_prefix: string
-
-  /**
-   * 用户手机号，带掩码
-   */
-  mobile: string
-
-  /**
-   * 当前邀请注册的人数
-   */
-  invited_count: number
+  [key: string]: unknown
 }
 
 export interface KHGrantUserRoleResponse {
@@ -113,11 +47,4 @@ export interface KHRevokeUserRoleResponse {
    * 角色id的列表
    */
   roles: number[]
-}
-
-export interface KHGuildUserListResponse {
-  items: KHUser[]
-  user_count: number
-  online_count: number
-  offline_count: number
 }

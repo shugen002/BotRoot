@@ -1,4 +1,4 @@
-import axios, { AxiosInstance } from 'axios'
+import axios, { AxiosInstance, AxiosResponse } from 'axios'
 import { cloneDeep } from 'lodash'
 import { EventEmitter } from 'events'
 import FormData, { Stream } from 'form-data'
@@ -32,6 +32,7 @@ import WebSocketSource from './MessageSource/WebSocketSource'
 import { Role } from './types/types'
 import { KHRole } from './types/kaiheila/types'
 import { API } from './api'
+import { URLSearchParams } from 'url'
 
 export interface BotConfig {
   mode: 'webhook' | 'websocket' | 'pc'
@@ -227,7 +228,8 @@ export class KaiheilaBot extends EventEmitter {
     })
   }
 
-  post(url: string, data: any) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/explicit-module-boundary-types
+  post(url: string, data: any): Promise<AxiosResponse<any>> {
     return this.axios.post(url, JSON.stringify(data), {
       headers: {
         'Content-Type': 'application/json',
@@ -235,54 +237,11 @@ export class KaiheilaBot extends EventEmitter {
     })
   }
 
-  get(url: string, params: any) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/explicit-module-boundary-types
+  get(url: string, params: any): Promise<AxiosResponse<any>> {
     return this.axios.get(url, {
       params: new URLSearchParams(params),
     })
-  }
-
-  /**
-   * 拉取机器人所在的所有服务器。
-   */
-  async getGuildList() {
-    const res = await this.get('v3/guild/list', {})
-    return res.data
-  }
-
-  async getGateWay(compress = 0) {
-    const data = (
-      await this.get('v3/gateway/index', {
-        compress,
-      })
-    ).data as KHAPIResponse<KHGetGatewayResponse>
-    if (data.code === 0) {
-      return data.data as GetGatewayResponse
-    } else {
-      throw new RequestError(data.code, data.message)
-    }
-  }
-
-  async getCurrentUserInfo() {
-    const data = (await this.get('v3/user/me', {}))
-      .data as KHAPIResponse<KHGetCurrentUserInfoResponse>
-    if (data.code === 0) {
-      return {
-        id: data.data.id,
-        username: data.data.username,
-        identifyNum: data.data.identify_num,
-        online: data.data.online,
-        status: data.data.status,
-        avatar: data.data.avatar,
-        bot: data.data.bot,
-        mobileVerified: data.data.mobile_verified,
-        system: data.data.system,
-        mobilePrefix: data.data.mobile_prefix,
-        invitedCount: data.data.invited_count,
-        mobile: data.data.mobile,
-      } as CurrentUserInfo
-    } else {
-      throw new RequestError(data.code, data.message)
-    }
   }
 
   /**
@@ -462,31 +421,6 @@ export class KaiheilaBot extends EventEmitter {
     ).data as KHAPIResponse<{ url: string }>
     if (data.code === 0) {
       return data.data.url
-    } else {
-      throw new RequestError(data.code, data.message)
-    }
-  }
-
-  /**
-   * 修改服务器中用户的昵称
-   * @param guildId 服务器的 ID
-   * @param userId 要修改昵称的目标用户 ID，不传则修改当前登陆用户的昵称
-   * @param nickname 昵称，2 - 64 长度，不传则清空昵称
-   */
-  async modifyUserNickname(
-    guildId: string,
-    userId?: string,
-    nickname?: string
-  ) {
-    const data = (
-      await this.post('v3/guild/nickname', {
-        guild_id: guildId,
-        user_id: userId,
-        nickname: nickname,
-      })
-    ).data as KHAPIResponse<[]>
-    if (data.code === 0) {
-      return true
     } else {
       throw new RequestError(data.code, data.message)
     }

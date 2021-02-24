@@ -32,7 +32,7 @@ export interface KHHelloPacket {
   s: KHOpcode
   d: {
     code: 0 | 40100 | 40101 | 40102 | 40103
-    sessionId?: string
+    session_id?: string
   }
 }
 

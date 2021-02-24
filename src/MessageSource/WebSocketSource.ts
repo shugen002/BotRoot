@@ -11,7 +11,6 @@ import {
   KHPingPacket,
   KHReconnectPacket,
 } from '../types/kaiheila/packet'
-import { URL } from 'url'
 
 export default class WebSocketSource
   extends EventEmitter
@@ -29,17 +28,17 @@ export default class WebSocketSource
   private url?: string
   sessionId: string | undefined
   heartbeatInterval: any
-  private sn: number = 0
+  private sn = 0
   heartbeatTimeout: any
   private buffer: KHEventPacket[] = []
 
-  constructor(self: KaiheilaBot, compress: boolean = true) {
+  constructor(self: KaiheilaBot, compress = true) {
     super()
     this.self = self
     this.compress = compress
   }
 
-  async connect() {
+  async connect(): Promise<boolean> {
     if (this.stage === 0) {
       this.nextStage()
     }
@@ -48,7 +47,7 @@ export default class WebSocketSource
 
   private async getGateWay() {
     try {
-      this.url = (await this.self.getGateWay(this.compress ? 1 : 0)).url
+      this.url = (await this.self.API.gateway.index(this.compress ? 1 : 0)).url
       this.nextStage()
     } catch (error) {
       this.retry(error)
@@ -118,11 +117,13 @@ export default class WebSocketSource
 
   private connectSocket() {
     if (this.url) {
+      // eslint-disable-next-line @typescript-eslint/no-this-alias
       const self = this
       if (this.sessionId) {
         this.url += '&resume=1&sessionId=' + this.sessionId + '&sn=' + this.sn
       }
       this.socket = new WebSocket(this.url)
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       this.socket.id = Date.now()
       this.socket.on('message', function (data: any) {
@@ -236,7 +237,6 @@ export default class WebSocketSource
     }
   }
 
-  // eslint-disable-next-line node/handle-callback-err
   private async retry(error?: Error) {
     this.retryTimes++
     switch (this.stage) {
@@ -272,7 +272,9 @@ export default class WebSocketSource
           if (this.socket) {
             this.socket.close()
           }
-        } catch (error) {}
+        } catch (error) {
+          // do nothing
+        }
         if (this.helloTimeout) {
           clearTimeout(this.helloTimeout)
           this.helloTimeout = undefined
@@ -300,7 +302,9 @@ export default class WebSocketSource
             if (this.socket) {
               this.socket.close()
             }
-          } catch (error) {}
+          } catch (error) {
+            // do nothing
+          }
           if (this.helloTimeout) {
             clearTimeout(this.helloTimeout)
             this.helloTimeout = undefined
@@ -334,11 +338,11 @@ export default class WebSocketSource
     }
     switch (packet.d.code) {
       case 0:
-        if (this.sessionId !== packet.d.sessionId) {
+        if (this.sessionId !== packet.d.session_id) {
           this.buffer = []
           this.sn = 0
         }
-        this.sessionId = packet.d.sessionId
+        this.sessionId = packet.d.session_id
         this.nextStage()
         break
       case 40100:
@@ -385,6 +389,7 @@ export default class WebSocketSource
     this.sessionId = undefined
     this.buffer = []
     this.nextStage()
+    console.warn('Receive Reconnect Packet : ' + packet.d)
   }
 
   private startHeartbeat() {

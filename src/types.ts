@@ -115,7 +115,7 @@ export class MessageBase {
   msgId: string
   msgTimestamp: number
   channelId: string
-  guildId: string = ''
+  guildId = ''
   channelType: string
   authorId: string
 
@@ -154,7 +154,7 @@ export class TextMessage extends MessageBase {
   author: User
   quote?: TextMessage
   channelName?: string
-  code: string = ''
+  code = ''
   content: string
   mention: {
     user: string[]
@@ -204,7 +204,7 @@ export class ImageAttachment extends Attachment {
 
 export class ImageMessage extends MessageBase {
   type = MessageType.image
-  code: string = ''
+  code = ''
   content: string
   author: User
   attachment: ImageAttachment
