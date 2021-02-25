@@ -1,5 +1,5 @@
-import { KaiheilaBot } from '../..'
-import RequestError from '../../error/RequestError'
+import { BotInstance } from '../../BotInstance'
+import RequestError from '../../models/error/RequestError'
 import { transformUser } from '../../helper'
 import { KHAPIResponse } from '../../types/kaiheila/api'
 import {
@@ -10,8 +10,8 @@ import {
 } from './channelRole.types'
 
 export class ChannelRoleAPI {
-  private self: KaiheilaBot
-  constructor(self: KaiheilaBot) {
+  private self: BotInstance
+  constructor(self: BotInstance) {
     this.self = self
   }
 

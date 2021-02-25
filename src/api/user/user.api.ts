@@ -1,5 +1,5 @@
-import { KaiheilaBot } from '../..'
-import RequestError from '../../error/RequestError'
+import { BotInstance } from '../../BotInstance'
+import RequestError from '../../models/error/RequestError'
 import { KHAPIResponse } from '../../types/kaiheila/api'
 import {
   CurrentUserInfoInternal,
@@ -7,8 +7,8 @@ import {
 } from './user.types'
 
 export class UserAPI {
-  private self: KaiheilaBot
-  constructor(self: KaiheilaBot) {
+  private self: BotInstance
+  constructor(self: BotInstance) {
     this.self = self
   }
   async getCurrentUserInfo(): Promise<CurrentUserInfoInternal> {

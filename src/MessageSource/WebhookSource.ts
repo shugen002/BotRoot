@@ -3,10 +3,10 @@ import { EventEmitter } from 'events'
 
 import Koa from 'koa'
 import bodyParser from 'koa-bodyparser'
-import FailDecryptError from '../error/FailDecryptError'
+import FailDecryptError from '../models/error/FailDecryptError'
 
 import { KHPacket } from '../types/kaiheila/packet'
-import { MessageSource } from '../types'
+import { MessageSource } from '../types/internal/MessageSource'
 import { zeroPadding } from '../utils'
 
 interface snMap {

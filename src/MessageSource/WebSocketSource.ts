@@ -1,7 +1,6 @@
 import { EventEmitter } from 'events'
-import { MessageSource } from '../types'
 import WebSocket from 'ws'
-import { KaiheilaBot } from '..'
+import { BotInstance } from '../BotInstance'
 import { inflate, InputType } from 'zlib'
 import {
   KHEventPacket,
@@ -11,12 +10,13 @@ import {
   KHPingPacket,
   KHReconnectPacket,
 } from '../types/kaiheila/packet'
+import { MessageSource } from '../types/internal/MessageSource'
 
 export default class WebSocketSource
   extends EventEmitter
   implements MessageSource {
   type = 'websocket'
-  private self: KaiheilaBot
+  private self: BotInstance
   socket?: WebSocket
   private compress: boolean
   private helloTimeout: any
@@ -32,7 +32,7 @@ export default class WebSocketSource
   heartbeatTimeout: any
   private buffer: KHEventPacket[] = []
 
-  constructor(self: KaiheilaBot, compress = true) {
+  constructor(self: BotInstance, compress = true) {
     super()
     this.self = self
     this.compress = compress
