@@ -39,7 +39,12 @@ export interface KaiheilaBot {
    * 注册监听未知的事件
    */
   on(event: 'unknownEvent', listener: (event: KHMessage) => void): this
+  /**
+   * 未封装的API
+   */
+  API: API
 }
 import { BotInstance } from './BotInstance'
+import { API } from './api'
 
 export const KaiheilaBot = (BotInstance as unknown) as KaiheilaBot

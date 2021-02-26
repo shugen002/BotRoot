@@ -5,21 +5,19 @@ import Koa from 'koa'
 import bodyParser from 'koa-bodyparser'
 import FailDecryptError from '../models/Error/FailDecryptError'
 
-import { KHPacket } from '../types/kaiheila/packet'
-import { MessageSource } from '../types/internal/MessageSource'
+import { KHEventPacket, KHPacket } from '../types/kaiheila/packet'
+
 import { zeroPadding } from '../utils'
+import { MessageSource } from './MessageSource'
 
 interface snMap {
   [key: number]: number
 }
 
-export default class WebhookSource
-  extends EventEmitter
-  implements MessageSource {
+export default class WebhookSource extends MessageSource {
   type = 'webhook'
   private snMap: snMap = {}
   private key?: Buffer
-  public ignoreDecryptError = true
   public verifyToken?: string
   public port = 8600
   public httpServer?: Koa<Koa.DefaultState, Koa.DefaultContext>
@@ -65,15 +63,8 @@ export default class WebhookSource
       try {
         eventRequest = this.decryptRequest(request)
       } catch (error) {
-        if (this.ignoreDecryptError) {
-          return next()
-        } else {
-          this.emit('error', error)
-          context.throw(
-            'Not Kaiheila Request or bad encryption or unencrypted request',
-            500
-          )
-        }
+        console.warn('Decrypt Error', error)
+        return next()
       }
     } else {
       eventRequest = request
@@ -85,12 +76,14 @@ export default class WebhookSource
       return
     }
     context.body = 1
-    if (!this.verifySN(eventRequest)) {
+    this.onEventArrive(eventRequest as KHEventPacket)
+  }
+  protected onEventArrive(packet: KHEventPacket): void {
+    if (!this.verifySN(packet)) {
       return
     }
-    this.emit('message', eventRequest)
+    this.emit('message', packet)
   }
-
   /**
    * 解密
    * @param request 请求体

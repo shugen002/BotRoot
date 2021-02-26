@@ -1,5 +1,13 @@
 import EventEmitter from 'events'
-import { KHEventPacket, KHPacket } from '../types/kaiheila/packet'
+import { KHEventPacket } from '../types/kaiheila/packet'
+
+export interface MessageSource extends EventEmitter {
+  type: string
+
+  on(event: 'message', listener: (eventRequest: KHEventPacket) => void): this
+
+  connect(): Promise<boolean>
+}
 
 export class MessageSource extends EventEmitter {
   constructor() {

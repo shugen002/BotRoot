@@ -37,4 +37,5 @@ export class MessageAPI {
       throw new RequestError(data.code, data.message)
     }
   }
+  // TODO
 }
