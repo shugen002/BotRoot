@@ -1,6 +1,6 @@
 import { KHFileMessage } from '../../types/kaiheila/kaiheila.type'
 import { MessageType } from '../../types/message'
-import { FileAttachment } from '../attachment/FileAttachment'
+import { FileAttachment } from '../Attachment'
 import { User } from '../User'
 import { MessageBase } from './MessageBase'
 

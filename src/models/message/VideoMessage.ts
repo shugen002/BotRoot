@@ -1,6 +1,6 @@
 import { KHVideoMessage } from '../../types/kaiheila/kaiheila.type'
 import { MessageType } from '../../types/message'
-import { VideoAttachment } from '../attachment/VideoAttachment'
+import { VideoAttachment } from '../Attachment'
 import { User } from '../User'
 import { MessageBase } from './MessageBase'
 

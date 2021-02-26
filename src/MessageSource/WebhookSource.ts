@@ -3,7 +3,7 @@ import { EventEmitter } from 'events'
 
 import Koa from 'koa'
 import bodyParser from 'koa-bodyparser'
-import FailDecryptError from '../models/error/FailDecryptError'
+import FailDecryptError from '../models/Error/FailDecryptError'
 
 import { KHPacket } from '../types/kaiheila/packet'
 import { MessageSource } from '../types/internal/MessageSource'

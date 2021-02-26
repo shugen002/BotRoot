@@ -1,7 +1,7 @@
 import { KHVideoAttachment } from '../../types/kaiheila/kaiheila.type'
-import { Attachment } from './base'
+import { AttachmentBase } from './AttachmentBase'
 
-export class VideoAttachment extends Attachment {
+export class VideoAttachment extends AttachmentBase {
   type = 'video'
   size: number
   fileType: string

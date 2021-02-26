@@ -1,6 +1,6 @@
 import { BotInstance } from '../../BotInstance'
-import RequestError from '../../models/error/RequestError'
 import { transformUser } from '../../helper'
+import RequestError from '../../models/Error/RequestError'
 import { KHAPIResponse } from '../../types/kaiheila/api'
 import {
   GuildListResponseInternal,

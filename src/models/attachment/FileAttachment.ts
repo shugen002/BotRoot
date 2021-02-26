@@ -1,7 +1,7 @@
 import { KHFileAttachment } from '../../types/kaiheila/kaiheila.type'
-import { Attachment } from './base'
+import { AttachmentBase } from './AttachmentBase'
 
-export class FileAttachment extends Attachment {
+export class FileAttachment extends AttachmentBase {
   type = 'file'
   fileType: string
   size: number

@@ -3,11 +3,10 @@ import { cloneDeep } from 'lodash'
 import { EventEmitter } from 'events'
 import FormData, { Stream } from 'form-data'
 
-import { KHMessage, KHSystemMessage } from './types/kaiheila/kaiheila.type'
 import { KHPacket } from './types/kaiheila/packet'
 import WebhookSource from './MessageSource/WebhookSource'
 import { KHAPIResponse, KHGrantUserRoleResponse } from './types/kaiheila/api'
-import RequestError from './models/error/RequestError'
+import RequestError from './models/Error/RequestError'
 import { UserRoleResponse } from './types/api'
 import WebSocketSource from './MessageSource/WebSocketSource'
 import { RoleInternal } from './types/internal'
@@ -21,7 +20,7 @@ import {
   FileMessage,
   AudioMessage,
   KMarkDownMessage,
-} from './models/message'
+} from './models/Message'
 import { MessageType } from './types/message'
 import { MessageSource } from './types/internal/MessageSource'
 
@@ -138,28 +137,6 @@ export class BotInstance extends EventEmitter {
         this.emit('unknownEvent', cloneDeep(eventRequest.d))
         break
     }
-  }
-
-  /**
-   * 发送频道聊天消息
-   * @param type 消息类型
-   * @param channelId 目标频道 id
-   * @param content 消息内容
-   * @param quote 回复某条消息的 msgId
-   */
-  sendChannelMessage(
-    type: MessageType,
-    channelId: string,
-    content: string,
-    quote?: string
-  ) {
-    return this.post('v3/channel/message', {
-      object_name: type,
-      channel_id: channelId,
-      content: content,
-      quote,
-      nonce: Math.random(),
-    })
   }
 
   /**

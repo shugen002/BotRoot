@@ -10,11 +10,9 @@ import {
   KHPingPacket,
   KHReconnectPacket,
 } from '../types/kaiheila/packet'
-import { MessageSource } from '../types/internal/MessageSource'
+import { MessageSource } from './MessageSource'
 
-export default class WebSocketSource
-  extends EventEmitter
-  implements MessageSource {
+export default class WebSocketSource extends MessageSource {
   type = 'websocket'
   private self: BotInstance
   socket?: WebSocket
@@ -28,9 +26,7 @@ export default class WebSocketSource
   private url?: string
   sessionId: string | undefined
   heartbeatInterval: any
-  private sn = 0
   heartbeatTimeout: any
-  private buffer: KHEventPacket[] = []
 
   constructor(self: BotInstance, compress = true) {
     super()
@@ -70,23 +66,7 @@ export default class WebSocketSource
         this.handleHelloPacket(packet)
         break
       case KHOpcode.EVENT:
-        if ((packet as KHEventPacket).sn === this.sn + 1) {
-          this.sn += 1
-          this.emit('message', packet)
-          this.buffer.sort((a, b) => a.sn - b.sn)
-          while (this.buffer.length > 0 && this.buffer[0].sn < this.sn + 1) {
-            this.buffer.shift()
-          }
-          while (this.buffer.length > 0 && this.buffer[0].sn === this.sn + 1) {
-            const packet = this.buffer.shift()
-            this.emit('message', packet)
-            while (this.buffer.length > 0 && this.buffer[0].sn < this.sn + 1) {
-              this.buffer.shift()
-            }
-          }
-        } else if ((packet as KHEventPacket).sn > this.sn + 1) {
-          this.buffer.push(packet as KHEventPacket)
-        }
+        this.onEventArrive(packet as KHEventPacket)
         break
       case KHOpcode.PING:
         console.warn('Receive Wrong Direction Packet!')

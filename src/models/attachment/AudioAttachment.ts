@@ -1,7 +1,7 @@
 import { KHAudioAttachment } from '../../types/kaiheila/kaiheila.type'
-import { Attachment } from './base'
+import { AttachmentBase } from './AttachmentBase'
 
-export class AudioAttachment extends Attachment {
+export class AudioAttachment extends AttachmentBase {
   type = 'audio'
   mimeType: string
   voice: string

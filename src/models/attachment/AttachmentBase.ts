@@ -4,7 +4,7 @@ import { KHAttachment } from '../../types/kaiheila/kaiheila.type'
  *
  * 请注意类型为Audio的的url是空的！
  */
-export class Attachment {
+export class AttachmentBase {
   name: string
   type: string
   url?: string

@@ -5,7 +5,7 @@ import {
   FileMessage,
   AudioMessage,
   KMarkDownMessage,
-} from './models/message'
+} from './models/Message'
 import { KHMessage, KHSystemMessage } from './types/kaiheila/kaiheila.type'
 
 export interface KaiheilaBot {
