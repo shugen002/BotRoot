@@ -21,87 +21,78 @@ http://你的公网IP或域名:8600/?compress=0
 代码：
 
 ```js
-var Bot = require("kaiheila-bot-root").KaiheilaBot;
+var Bot = require('kaiheila-bot-root').KaiheilaBot
 var bot = new Bot({
-  mode: "webhook",
+  mode: 'webhook',
   port: 8600,
-  key: "YOUR ENCRYPT KEY", // 和设置的一致，如果这个值为空视为不加密
-  token: "YOUR TOKEN",
-  verifyToken: "YOUR VERIFY TOKEN",
-});
+  key: 'YOUR ENCRYPT KEY', // 和设置的一致，如果这个值为空视为不加密
+  token: 'YOUR TOKEN',
+  verifyToken: 'YOUR VERIFY TOKEN',
+})
 
-bot.on("rawEvent", (e) => {
-  console.log(e);
-  if (typeof e.msg_id === "string") {
+/**
+ * 输出保存原始数据
+ */
+bot.messageSource.on('message', (e) => {
+  console.log(e)
+  if (typeof e.msg_id === 'string') {
     writeFile(
       `cache/${e.msg_id}.json`,
       JSON.stringify(e, undefined, 2),
       (e) => {
         if (e) {
-          console.error(e);
+          console.error(e)
         }
       }
-    );
+    )
   }
-});
+})
+/**
+ * 监听文本信息
+ */
+bot.on('textMessage', (e) => {
+  console.log(e)
+})
 
-bot.on("message", (e) => {
-  console.log(e);
-});
-bot.on("error", (e) => {
-  console.log(e);
-});
-
-bot.listen();
+bot.listen()
 ```
 
 ### Webhook 合并模式
 
+做了，懒得写了
+
+### websocket 模式
+
 ```js
-var Koa = require("koa");
-var bodyParser = require("koa-bodyparser");
-
-var Bot = require("kaiheila-bot-root").KaiheilaBot;
-
-const app = new Koa();
-app.use(bodyParser());
-
+var Bot = require('kaiheila-bot-root').KaiheilaBot
 var bot = new Bot({
-  mode: "webhook",
-  port: 8600,
-  key: "YOUR ENCRYPT KEY",
-  token: "YOUR TOKEN",
-  verifyToken: "YOUR VERIFY TOKEN",
-});
+  mode: 'websocket',
+  token: 'YOUR TOKEN',
+})
 
-bot.on("rawEvent", (e) => {
-  console.log(e);
-  if (typeof e.msg_id === "string") {
+/**
+ * 输出保存原始数据
+ */
+bot.messageSource.on('message', (e) => {
+  console.log(e)
+  if (typeof e.msg_id === 'string') {
     writeFile(
       `cache/${e.msg_id}.json`,
       JSON.stringify(e, undefined, 2),
       (e) => {
         if (e) {
-          console.error(e);
+          console.error(e)
         }
       }
-    );
+    )
   }
-});
+})
+/**
+ * 监听文本信息
+ */
+bot.on('textMessage', (e) => {
+  console.log(e)
+})
 
-bot.on("message", (e) => {
-  console.log(e);
-});
-
-app.use(bot.getMiddleware());
-
-app.listen(8600);
+bot.listen()
 ```
-
-### websocket 模式
-
-官方都还没出，急什么。
-
-### pc 模拟客户端模式
-
-在做了，在做了。

@@ -1,5 +1,4 @@
 import { createDecipheriv } from 'crypto'
-import { EventEmitter } from 'events'
 
 import Koa from 'koa'
 import bodyParser from 'koa-bodyparser'
@@ -52,7 +51,7 @@ export default class WebhookSource extends MessageSource {
    * 获取中间件
    * 可用于共用Koa实例。
    */
-  getMiddleware() {
+  getMiddleware(): Koa.Middleware {
     return this.route.bind(this)
   }
 
@@ -85,14 +84,15 @@ export default class WebhookSource extends MessageSource {
     if (!this.verifySN(packet)) {
       return
     }
-    this.emit('message', cloneDeep(packet))
+    this.emit('message', cloneDeep(packet.d))
     this.eventProcess(packet)
   }
   /**
    * 解密
    * @param request 请求体
    */
-  private decryptRequest(request: any) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private decryptRequest(request: any): KHPacket {
     if (typeof request.encrypt === 'string') {
       if (!this.key) {
         throw new FailDecryptError('No Key')
@@ -117,7 +117,8 @@ export default class WebhookSource extends MessageSource {
     }
   }
 
-  private verifyRequest(body: any) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private verifyRequest(body: any): boolean {
     if (
       typeof body !== 'object' ||
       typeof body.s !== 'number' ||
@@ -166,7 +167,7 @@ export default class WebhookSource extends MessageSource {
    *
    * webhook模式下会在指定端口号启动一个http服务
    */
-  async listen() {
+  async listen(): Promise<true> {
     const app = new Koa()
     app.use(bodyParser())
     app.use(this.getMiddleware())

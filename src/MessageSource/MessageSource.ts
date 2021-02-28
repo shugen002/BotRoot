@@ -1,4 +1,4 @@
-import EventEmitter from 'events'
+import { EventEmitter } from 'events'
 import { cloneDeep } from 'lodash'
 import { BotInstance } from '../BotInstance'
 import { transformMessage } from '../helper/transformer/message'
@@ -7,12 +7,12 @@ import { KHEventPacket } from '../types/kaiheila/packet'
 export interface MessageSource extends EventEmitter {
   type: string
 
-  on(event: 'message', listener: (eventRequest: KHEventPacket) => void): this
+  on(event: 'message', listener: (eventRequest: unknown) => void): this
 
   connect(): Promise<boolean>
 }
 
-export class MessageSource extends EventEmitter {
+export class MessageSource extends EventEmitter implements MessageSource {
   protected self: BotInstance
   constructor(self: BotInstance) {
     super()
@@ -26,7 +26,7 @@ export class MessageSource extends EventEmitter {
   protected onEventArrive(packet: KHEventPacket): void {
     if ((packet as KHEventPacket).sn === this.sn + 1) {
       this.sn += 1
-      this.emit('message', cloneDeep(packet))
+      this.emit('message', cloneDeep(packet.d))
       this.eventProcess(packet)
       this.buffer.sort((a, b) => a.sn - b.sn)
       while (this.buffer.length > 0 && this.buffer[0].sn < this.sn + 1) {
@@ -34,7 +34,7 @@ export class MessageSource extends EventEmitter {
       }
       while (this.buffer.length > 0 && this.buffer[0].sn === this.sn + 1) {
         const packet = this.buffer.shift()
-        this.emit('message', cloneDeep(packet))
+        this.emit('message', cloneDeep(packet?.d))
         this.eventProcess((packet as unknown) as KHEventPacket)
         while (this.buffer.length > 0 && this.buffer[0].sn < this.sn + 1) {
           this.buffer.shift()
