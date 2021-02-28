@@ -22,7 +22,7 @@ export enum MessageType {
   /**
    * KMarkdown消息类型
    */
-  kmarkdown = 9,
+  kMarkdown = 9,
   /**
    * 卡片消息类型
    */

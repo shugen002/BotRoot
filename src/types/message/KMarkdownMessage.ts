@@ -1,0 +1,18 @@
+import { User } from '../common'
+import { MessageType } from '../MessageType'
+import { MessageBase } from './MessageBase'
+
+export interface KMarkdownMessage extends MessageBase {
+  type: MessageType.kMarkdown
+  author: User
+  mention: {
+    user: string[]
+    roles: string[]
+    all: boolean
+    here: boolean
+    channels: string[]
+  }
+  channelName: string
+  content: string
+  code: string
+}

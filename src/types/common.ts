@@ -1,3 +1,13 @@
+import { AxiosInstance } from 'axios'
+import { API } from '../api'
+import { MessageSource } from '../MessageSource/MessageSource'
+import { AudioMessage } from './message/AudioMessage'
+import { FileMessage } from './message/FileMessage'
+import { ImageMessage } from './message/ImageMessage'
+import { KMarkdownMessage } from './message/KMarkDownMessage'
+import { TextMessage } from './message/TextMessage'
+import { VideoMessage } from './message/VideoMessage'
+
 /**
  * 用户
  *
@@ -234,4 +244,34 @@ export interface Channel {
    * 权限设置是否与分组同步, 1 or 0
    */
   permissionSync: number
+}
+
+export interface KaiheilaBot {
+  /**
+   * 目前开黑啦官方提供的所有API
+   */
+  API: API
+  /**
+   * 消息源
+   */
+  messageSource: MessageSource
+  /**
+   * 配置好的axios
+   */
+  axios: AxiosInstance
+  on(event: string, listener: (event: unknown) => void): this
+  on(event: 'systemMessage', listener: (event: unknown) => void): this
+  on(event: 'textMessage', listener: (event: TextMessage) => void): this
+  on(event: 'imageMessage', listener: (event: ImageMessage) => void): this
+  on(event: 'videoMessage', listener: (event: VideoMessage) => void): this
+  on(event: 'fileMessage', listener: (event: FileMessage) => void): this
+  on(event: 'audioMessage', listener: (event: AudioMessage) => void): this
+  on(
+    event: 'kmarkdownMessage',
+    listener: (event: KMarkdownMessage) => void
+  ): this
+  /**
+   * 未知的事件
+   */
+  on(event: 'unknownEvent', listener: (event: unknown) => void): this
 }

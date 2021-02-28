@@ -10,21 +10,8 @@ const bot = new Bot({
 })
 
 bot.connect()
-bot.on('rawEvent', (e) => {
-  console.log(e)
-  if (typeof e.msg_id === 'string') {
-    writeFile(
-      `cache/${e.msg_id}.json`,
-      JSON.stringify(e, undefined, 2),
-      (e) => {
-        if (e) {
-          console.error(e)
-        }
-      }
-    )
-  }
-})
-bot.on('message', (e) => {
+bot.on('textMessage', (e) => {
   console.log(e)
 })
+
 global.botInstance = bot

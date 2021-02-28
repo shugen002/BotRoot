@@ -3,6 +3,7 @@ import { EventEmitter } from 'events'
 
 import Koa from 'koa'
 import bodyParser from 'koa-bodyparser'
+import { cloneDeep } from 'lodash'
 import { BotInstance } from '../BotInstance'
 import FailDecryptError from '../models/Error/FailDecryptError'
 
@@ -84,7 +85,8 @@ export default class WebhookSource extends MessageSource {
     if (!this.verifySN(packet)) {
       return
     }
-    this.emit('message', packet)
+    this.emit('message', cloneDeep(packet))
+    this.eventProcess(packet)
   }
   /**
    * 解密
