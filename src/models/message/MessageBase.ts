@@ -1,5 +1,5 @@
 import { KHEventBase } from '../../types/kaiheila/kaiheila.type'
-import { MessageType } from '../../types/message'
+import { MessageType } from '../../types/MessageType'
 
 export class MessageBase {
   /**

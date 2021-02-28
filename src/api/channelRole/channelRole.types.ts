@@ -1,4 +1,4 @@
-import { UserInternal } from '../../types/internal'
+import { User } from '../../types/common'
 import { KHUser } from '../../types/kaiheila/types'
 
 export interface KHChannelRoleListResponse {
@@ -28,7 +28,7 @@ export interface ChannelRoleListResponseInternal {
     deny: number
   }[]
   permissionUsers: {
-    user: UserInternal
+    user: User
     allow: number
     deny: number
   }[]

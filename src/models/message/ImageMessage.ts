@@ -1,5 +1,5 @@
 import { KHImageMessage } from '../../types/kaiheila/kaiheila.type'
-import { MessageType } from '../../types/message'
+import { MessageType } from '../../types/MessageType'
 import { ImageAttachment } from '../Attachment'
 import { User } from '../User'
 import { MessageBase } from './MessageBase'

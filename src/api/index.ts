@@ -1,6 +1,7 @@
 import { BotInstance } from '../BotInstance'
 import { AssetAPI } from './asset/asset.api'
 import { ChannelRoleAPI } from './channelRole'
+import { DirectMessageAPI } from './directMessage'
 import { GatewayAPI } from './gateway'
 import { GuildAPI } from './guild'
 import { GuildMuteAPI } from './guildMute'
@@ -21,6 +22,7 @@ export class API {
   asset: AssetAPI
   guildRole: GuildRoleAPI
   intimacy: IntimacyAPI
+  directMessage: DirectMessageAPI
   constructor(self: BotInstance) {
     this.guild = new GuildAPI(self)
     this.guildMute = new GuildMuteAPI(self)
@@ -32,5 +34,6 @@ export class API {
     this.asset = new AssetAPI(self)
     this.guildRole = new GuildRoleAPI(self)
     this.intimacy = new IntimacyAPI(self)
+    this.directMessage = new DirectMessageAPI(self)
   }
 }

@@ -1,4 +1,4 @@
-import { defaultUser } from '../../helper'
+import { defaultUser } from '../../helper/defaultUser'
 import { KHAuthor } from '../../types/kaiheila/kaiheila.type'
 
 export class User {

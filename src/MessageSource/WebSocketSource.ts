@@ -1,4 +1,3 @@
-import { EventEmitter } from 'events'
 import WebSocket from 'ws'
 import { BotInstance } from '../BotInstance'
 import { inflate, InputType } from 'zlib'
@@ -14,7 +13,6 @@ import { MessageSource } from './MessageSource'
 
 export default class WebSocketSource extends MessageSource {
   type = 'websocket'
-  private self: BotInstance
   socket?: WebSocket
   private compress: boolean
   private helloTimeout: any
@@ -29,8 +27,7 @@ export default class WebSocketSource extends MessageSource {
   heartbeatTimeout: any
 
   constructor(self: BotInstance, compress = true) {
-    super()
-    this.self = self
+    super(self)
     this.compress = compress
   }
 
@@ -43,8 +40,11 @@ export default class WebSocketSource extends MessageSource {
 
   private async getGateWay() {
     try {
-      this.url = (await this.self.API.gateway.index(this.compress ? 1 : 0)).url
-      this.nextStage()
+      const url = (await this.self.API.gateway.index(this.compress ? 1 : 0)).url
+      if (this.stage === 1) {
+        this.url = url
+        this.nextStage()
+      }
     } catch (error) {
       this.retry(error)
     }
@@ -161,8 +161,7 @@ export default class WebSocketSource extends MessageSource {
 
   private onHelloTimeout() {
     if (this.socket) {
-      this.socket.close()
-      this.socket = undefined
+      this.safeCloseSocket()
       if (this.helloTimeout) {
         clearTimeout(this.helloTimeout)
         this.helloTimeout = undefined
@@ -249,9 +248,7 @@ export default class WebSocketSource extends MessageSource {
         break
       case 4:
         try {
-          if (this.socket) {
-            this.socket.close()
-          }
+          this.safeCloseSocket()
         } catch (error) {
           // do nothing
         }
@@ -279,9 +276,7 @@ export default class WebSocketSource extends MessageSource {
         } else {
           console.warn('heartbeat without reponse over three times', error)
           try {
-            if (this.socket) {
-              this.socket.close()
-            }
+            this.safeCloseSocket()
           } catch (error) {
             // do nothing
           }
@@ -330,10 +325,7 @@ export default class WebSocketSource extends MessageSource {
       case 40102:
       case 40103:
         console.warn(`Receive ${packet.d.code}, Back to Stage 1`)
-        if (this.socket) {
-          this.socket.close()
-          this.socket = undefined
-        }
+        this.safeCloseSocket()
         if (this.helloTimeout) {
           clearTimeout(this.helloTimeout)
           this.helloTimeout = undefined
@@ -360,16 +352,13 @@ export default class WebSocketSource extends MessageSource {
       clearTimeout(this.helloTimeout)
       this.helloTimeout = undefined
     }
-    if (this.socket) {
-      this.socket.close()
-      this.socket = undefined
-    }
+    this.safeCloseSocket()
     this.stage = 0
     this.sn = 0
     this.sessionId = undefined
     this.buffer = []
     this.nextStage()
-    console.warn('Receive Reconnect Packet : ' + packet.d)
+    console.warn('Receive Reconnect Packet : ' + JSON.stringify(packet.d))
   }
 
   private startHeartbeat() {
@@ -408,6 +397,14 @@ export default class WebSocketSource extends MessageSource {
       this.retry()
     } else {
       console.warn('should not run to here')
+    }
+  }
+
+  private safeCloseSocket() {
+    if (this.socket) {
+      const socket = this.socket
+      this.socket = undefined
+      socket.close
     }
   }
 }

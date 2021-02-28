@@ -1,20 +1,10 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios'
-import { cloneDeep } from 'lodash'
 import { EventEmitter } from 'events'
 
-import { KHPacket } from './types/kaiheila/packet'
 import WebhookSource from './MessageSource/WebhookSource'
 import WebSocketSource from './MessageSource/WebSocketSource'
 import { API } from './api'
 import { URLSearchParams } from 'url'
-import {
-  TextMessage,
-  ImageMessage,
-  VideoMessage,
-  FileMessage,
-  AudioMessage,
-  KMarkDownMessage,
-} from './models/Message'
 import { MessageSource } from './MessageSource/MessageSource'
 
 export interface BotConfig {
@@ -82,52 +72,16 @@ export class BotInstance extends EventEmitter {
     switch (this.config.mode) {
       case 'websocket':
         this.messageSource = new WebSocketSource(this)
-        this.messageSource.on('message', this.handleMessage.bind(this))
         break
       default:
         this.messageSource = new WebhookSource(
+          this,
           config as {
             key?: string
             port: number
             verifyToken?: string
           }
         )
-        this.messageSource.on('message', this.handleMessage.bind(this))
-        break
-    }
-  }
-
-  private handleMessage(eventRequest: KHPacket) {
-    try {
-      this.emit('rawEvent', cloneDeep(eventRequest.d))
-    } catch (error) {
-      this.emit('error', error)
-    }
-
-    switch (eventRequest.d.type) {
-      case 255:
-        this.emit('systemMessage', cloneDeep(eventRequest.d))
-        break
-      case 1:
-        this.emit('message', new TextMessage(cloneDeep(eventRequest.d)))
-        break
-      case 2:
-        this.emit('message', new ImageMessage(cloneDeep(eventRequest.d)))
-        break
-      case 3:
-        this.emit('message', new VideoMessage(cloneDeep(eventRequest.d)))
-        break
-      case 4:
-        this.emit('message', new FileMessage(cloneDeep(eventRequest.d)))
-        break
-      case 8:
-        this.emit('message', new AudioMessage(cloneDeep(eventRequest.d)))
-        break
-      case 9:
-        this.emit('message', new KMarkDownMessage(cloneDeep(eventRequest.d)))
-        break
-      default:
-        this.emit('unknownEvent', cloneDeep(eventRequest.d))
         break
     }
   }

@@ -36,12 +36,12 @@ export interface KHUser {
   avatar: string
   online: boolean
   nickname: string
-  joined_at: number
-  active_time: number
-  roles: number[]
-  is_master: boolean
+  joined_at?: number
+  active_time?: number
+  roles?: number[]
+  is_master?: boolean
   identify_num: string
-  mobile_verified: boolean
+  mobile_verified?: boolean
   color?: number
   bot?: boolean
   hoist_info?: {
@@ -60,5 +60,5 @@ export interface KHUser {
     color: string
     text: string
   }
-  os: string
+  os?: string
 }

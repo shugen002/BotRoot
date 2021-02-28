@@ -3,7 +3,7 @@
  *
  * 使用非标准属性时请做好没有的处理
  */
-export interface UserInternal {
+export interface User {
   /**
    * 用户id
    */
@@ -35,7 +35,7 @@ export interface UserInternal {
   /**
    * 用户在当前服务器中的角色 id 组成的列表
    */
-  roles: number[]
+  roles?: number[]
   /**
    * 是否服务器主人
    */
@@ -89,7 +89,7 @@ export interface UserInternal {
 /**
  * 服务器
  */
-export interface GuildInternal {
+export interface Guild {
   /**
    * 服务器id
    */
@@ -146,7 +146,7 @@ export interface GuildInternal {
 /**
  * 角色
  */
-export interface RoleInternal {
+export interface Role {
   /**
    * 角色的id
    */
@@ -180,7 +180,7 @@ export interface RoleInternal {
 /**
  * 频道
  */
-export interface ChannelInternal {
+export interface Channel {
   /**
    * 频道id
    */
@@ -229,7 +229,7 @@ export interface ChannelInternal {
    * 针对用户在该频道的权限覆写规则组成的列表
    * TODO
    */
-  permissionUsers: UserInternal[]
+  permissionUsers: User[]
   /**
    * 权限设置是否与分组同步, 1 or 0
    */

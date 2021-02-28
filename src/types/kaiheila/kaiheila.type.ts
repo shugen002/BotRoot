@@ -32,7 +32,7 @@ export interface KHAuthor {
   id: string
   nickname: string
   roles: number[]
-  online?: boolean
+  online: boolean
   tag_info?: {
     color: string
     text: string
@@ -185,6 +185,35 @@ export interface KHKMarkDownMessage extends KHEventBase {
   }
 }
 
+export interface KHCardMessage extends KHEventBase {
+  type: 10
+  extra: {
+    type: 10
+    guild_id: string
+    channel_name: string
+    mention: string[]
+    mention_all: boolean
+    mention_roles: string[]
+    mention_here: boolean
+    nav_channels: string[]
+    code: string
+    author: KHAuthor
+    kmarkdown: {
+      raw_content: string
+      mention_part: {
+        id: number
+        username: string
+        full_name: string
+        avatar: string
+      }[]
+      mention_role_part: {
+        role_id: number
+        name: string
+      }[]
+    }
+  }
+}
+
 export type KHMessage =
   | KHSystemMessage
   | KHTextMessage
@@ -193,6 +222,7 @@ export type KHMessage =
   | KHFileMessage
   | KHAudioMessage
   | KHKMarkDownMessage
+  | KHCardMessage
 
 export interface KaiheilaEncryptPacket {
   encrypt: string

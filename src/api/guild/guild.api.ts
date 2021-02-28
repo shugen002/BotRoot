@@ -1,5 +1,5 @@
 import { BotInstance } from '../../BotInstance'
-import { transformUser } from '../../helper'
+import { transformUser } from '../../helper/transformer/User'
 import RequestError from '../../models/Error/RequestError'
 import { KHAPIResponse } from '../../types/kaiheila/api'
 import {

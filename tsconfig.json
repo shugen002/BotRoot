@@ -14,7 +14,8 @@
     "experimentalDecorators": true,
     "types": [
       "@types/node"
-    ]
+    ],
+    "declaration": true
   },
   "include": [
     "src"

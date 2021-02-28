@@ -1,4 +1,4 @@
-import { GuildInternal, UserInternal } from '../../types/internal'
+import { Guild, User } from '../../types/common'
 import { KHAPIMultiPage } from '../../types/kaiheila/api'
 import { KHGuild } from '../../types/kaiheila/kaiheila.type'
 import { KHUser } from '../../types/kaiheila/types'
@@ -16,7 +16,7 @@ export interface KHGuildUserListResponse extends KHAPIMultiPage<KHUser> {
 }
 
 export interface GuildListResponseInternal {
-  items: GuildInternal[]
+  items: Guild[]
   meta: {
     page: number
     pageSize: number
@@ -26,5 +26,5 @@ export interface GuildListResponseInternal {
 }
 
 export interface GuildUserListInternal {
-  items: UserInternal[]
+  items: User[]
 }

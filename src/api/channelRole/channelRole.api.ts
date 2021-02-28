@@ -1,6 +1,6 @@
 import { BotInstance } from '../../BotInstance'
+import { transformUser } from '../../helper/transformer/User'
 import RequestError from '../../models/Error/RequestError'
-import { transformUser } from '../../helper'
 import { KHAPIResponse } from '../../types/kaiheila/api'
 import {
   ChannelRoleListResponseInternal,

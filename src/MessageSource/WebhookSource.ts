@@ -3,6 +3,7 @@ import { EventEmitter } from 'events'
 
 import Koa from 'koa'
 import bodyParser from 'koa-bodyparser'
+import { BotInstance } from '../BotInstance'
 import FailDecryptError from '../models/Error/FailDecryptError'
 
 import { KHEventPacket, KHPacket } from '../types/kaiheila/packet'
@@ -24,6 +25,7 @@ export default class WebhookSource extends MessageSource {
   connect: () => Promise<boolean>
 
   constructor(
+    self: BotInstance,
     config: {
       key?: string
       port: number
@@ -32,7 +34,7 @@ export default class WebhookSource extends MessageSource {
       port: 8600,
     }
   ) {
-    super()
+    super(self)
     if (config.key) {
       this.key = zeroPadding(config.key || '')
     }
@@ -107,9 +109,8 @@ export default class WebhookSource extends MessageSource {
       const data = JSON.parse(decrypt.toString())
       return data as KHPacket
     } else {
-      if (this.ignoreDecryptError) {
-        throw new FailDecryptError('Unencrypted Request')
-      }
+      console.log('Unencrypted Request')
+
       return request as KHPacket
     }
   }

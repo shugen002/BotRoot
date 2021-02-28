@@ -1,4 +1,5 @@
 import EventEmitter from 'events'
+import { BotInstance } from '../BotInstance'
 import { KHEventPacket } from '../types/kaiheila/packet'
 
 export interface MessageSource extends EventEmitter {
@@ -10,8 +11,10 @@ export interface MessageSource extends EventEmitter {
 }
 
 export class MessageSource extends EventEmitter {
-  constructor() {
+  protected self: BotInstance
+  constructor(self: BotInstance) {
     super()
+    this.self = self
   }
   async connect(): Promise<boolean> {
     return false

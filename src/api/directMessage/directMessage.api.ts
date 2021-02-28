@@ -6,11 +6,11 @@ import { KHAPIResponse } from '../../types/kaiheila/api'
 import { KHUser } from '../../types/kaiheila/types'
 import { MessageType } from '../../types/MessageType'
 import {
-  KHMessageCreateResponse,
-  MessageCreateResponseInternal,
-} from './message.types'
+  KHDirCstMessageCreateResponse,
+  DirectMessageCreateResponseInternal,
+} from './directMessage.types'
 
-export class MessageAPI {
+export class DirectMessageAPI {
   private self: BotInstance
   constructor(self: BotInstance) {
     this.self = self
@@ -19,31 +19,30 @@ export class MessageAPI {
   // TODO: LIST
 
   /**
-   * 发送频道聊天消息
-   * 注意： 强列建议过滤掉机器人发送的消息，再进行回应。否则会很容易形成两个机器人循环自言自语导致发送量过大，进而导致机器人被封禁。如果确实需要机器人联动的情况，慎重进行处理，防止形成循环。
+   * 发送私信聊天消息
    * @param type 消息类型, 见[type], 不传默认为 `1`, 代表文本类型。`2` 图片消息，`3` 视频消息，`4` 文件消息，`9` 代表 kmarkdown 消息, `10` 代表卡片消息。
-   * @param targetId 目标频道 id
+   * @param targetId 目标用户 id，后端会自动创建会话。有此参数之后可不传 `chat_code` 参数
+   * @param chatCode 目标会话 id
    * @param content 消息内容
    * @param quote 回复某条消息的 `msgId`
-   * @param tempTargetId 用户id,如果传了，代表该消息是临时消息，该消息不会存数据库，但是会在频道内只给该用户推送临时消息。用于在频道内针对用户的操作进行单独的回应通知等。
    */
   async create(
     type: MessageType,
     targetId: string,
+    chatCode: string,
     content: string,
-    quote?: string,
-    tempTargetId?: string
-  ): Promise<MessageCreateResponseInternal> {
+    quote?: string
+  ): Promise<DirectMessageCreateResponseInternal> {
     const data = (
-      await this.self.post('v3/message/create', {
+      await this.self.post('v3/direct-message/create', {
         type,
         target_id: targetId,
         content,
         quote,
-        temp_target_id: tempTargetId,
+        chat_code: chatCode,
         nonce: Math.random(),
       })
-    ).data as KHAPIResponse<KHMessageCreateResponse>
+    ).data as KHAPIResponse<KHDirCstMessageCreateResponse>
     if (data.code === 0) {
       return {
         msgId: data.data.msg_id,
@@ -55,7 +54,7 @@ export class MessageAPI {
   }
 
   /**
-   * 更新频道聊天消息
+   * 更新私信聊天消息
    * @param msgId 消息 id
    * @param content 消息内容
    * @param quote 回复某条消息的 msgId。如果为空，则代表删除回复，不传则无影响。
@@ -66,7 +65,7 @@ export class MessageAPI {
     quote?: string
   ): Promise<boolean> {
     const data = (
-      await this.self.post('v3/message/update', {
+      await this.self.post('v3/direct-message/update', {
         msg_id: msgId,
         content,
         quote,
@@ -80,12 +79,14 @@ export class MessageAPI {
   }
 
   /**
-   * 删除频道聊天消息
+   * 删除私信聊天消息
+   *
+   * 只能删除自己的消息。
    * @param msgId 消息 id
    */
   async delete(msgId: string): Promise<boolean> {
     const data = (
-      await this.self.post('v3/message/delete', {
+      await this.self.post('v3/direct-message/delete', {
         msg_id: msgId,
       })
     ).data as KHAPIResponse<[]>
@@ -103,7 +104,7 @@ export class MessageAPI {
    */
   async reactionList(msgId: string, emoji: string): Promise<User[]> {
     const data = (
-      await this.self.get('v3/message/reaction-list', {
+      await this.self.get('v3/direct-message/reaction-list', {
         msg_id: msgId,
         emoji,
       })
@@ -122,7 +123,7 @@ export class MessageAPI {
    */
   async addReaction(msgId: string, emoji: string): Promise<boolean> {
     const data = (
-      await this.self.post('v3/message/add-reaction', {
+      await this.self.post('v3/direct-message/add-reaction', {
         msg_id: msgId,
         emoji,
       })
@@ -146,7 +147,7 @@ export class MessageAPI {
     userId: string
   ): Promise<boolean> {
     const data = (
-      await this.self.post('v3/message/delete-reaction', {
+      await this.self.post('v3/direct-message/delete-reaction', {
         msg_id: msgId,
         emoji,
         user_id: userId,

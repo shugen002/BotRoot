@@ -1,5 +1,5 @@
 import { KHTextMessage } from '../../types/kaiheila/kaiheila.type'
-import { MessageType } from '../../types/message'
+import { MessageType } from '../../types/MessageType'
 import { User } from '../User'
 import { MessageBase } from './MessageBase'
 

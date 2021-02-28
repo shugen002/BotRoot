@@ -1,6 +1,6 @@
 import { BotInstance } from '../../BotInstance'
 import RequestError from '../../models/Error/RequestError'
-import { RoleInternal } from '../../types/internal'
+import { Role } from '../../types/common'
 import { KHAPIResponse } from '../../types/kaiheila/api'
 import { KHRole } from '../../types/kaiheila/types'
 import {
@@ -20,7 +20,7 @@ export class GuildRoleAPI {
    * 获取服务器角色列表
    * @param guildId 服务器的id
    */
-  async index(guildId: string): Promise<RoleInternal[]> {
+  async index(guildId: string): Promise<Role[]> {
     const data = (
       await this.self.get('v3/guild-role/index', {
         guild_id: guildId,
@@ -37,7 +37,7 @@ export class GuildRoleAPI {
           mentionable: role.mentionable,
           permissions: role.permissions,
         }
-      }) as RoleInternal[]
+      }) as Role[]
     } else {
       throw new RequestError(data.code, data.message)
     }
@@ -49,7 +49,7 @@ export class GuildRoleAPI {
    * @param guildId 服务器id
    * @returns 创建的角色
    */
-  async create(guildId: string, name?: string): Promise<RoleInternal> {
+  async create(guildId: string, name?: string): Promise<Role> {
     const data = (
       await this.self.post('v3/guild-role/create', {
         name,
@@ -65,7 +65,7 @@ export class GuildRoleAPI {
         hoist: data.data.hoist,
         mentionable: data.data.mentionable,
         permissions: data.data.permissions,
-      } as RoleInternal
+      } as Role
     } else {
       throw new RequestError(data.code, data.message)
     }
@@ -108,7 +108,7 @@ export class GuildRoleAPI {
    * @param guildId 服务器id
    * @returns 更新后的角色
    */
-  async update(guildId: string, role: RoleInternal): Promise<RoleInternal> {
+  async update(guildId: string, role: Role): Promise<Role> {
     const data = (
       await this.self.post('v3/guild-role/update', {
         guild_id: guildId,
@@ -129,7 +129,7 @@ export class GuildRoleAPI {
         hoist: data.data.hoist,
         mentionable: data.data.mentionable,
         permissions: data.data.permissions,
-      } as RoleInternal
+      } as Role
     } else {
       throw new RequestError(data.code, data.message)
     }
