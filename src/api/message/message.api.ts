@@ -3,7 +3,7 @@ import { transformUser } from '../../helper/transformer/User'
 import RequestError from '../../models/Error/RequestError'
 import { User } from '../../types/common'
 import { KHAPIResponse } from '../../types/kaiheila/api'
-import { KHUser } from '../../types/kaiheila/types'
+import { KHUser } from '../../types/kaiheila/common'
 import { MessageType } from '../../types/MessageType'
 import {
   KHMessageCreateResponse,

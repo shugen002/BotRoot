@@ -1,7 +1,6 @@
 import { cloneDeep } from 'lodash'
 
 import {
-  KHEventBase,
   KHMessage,
   KHTextMessage,
   KHImageMessage,
@@ -9,8 +8,11 @@ import {
   KHFileMessage,
   KHAudioMessage,
   KHKMarkDownMessage,
-} from '../../types/kaiheila/kaiheila.type'
+  KHCardMessage,
+  KHSystemMessage,
+} from '../../types/kaiheila/message'
 import { AudioMessage } from '../../types/message/AudioMessage'
+import { CardMessage } from '../../types/message/CardMessage'
 import { FileMessage } from '../../types/message/FileMessage'
 import { ImageMessage } from '../../types/message/ImageMessage'
 import { KMarkdownMessage } from '../../types/message/KMarkDownMessage'
@@ -57,7 +59,7 @@ export function transformMessage(message: KHMessage): TransformResult {
       }
       break
     case 10:
-      return { type: 'cardMessage', data: cloneDeep(message) }
+      return { type: 'cardMessage', data: transformCardMessage(message) }
       break
     default:
       return { type: 'unknownEvent', data: cloneDeep(message) }
@@ -179,4 +181,30 @@ export function transformKMarkdownMessage(
     channels: message.extra.nav_channels,
   }
   return base
+}
+
+export function transformCardMessage(message: KHCardMessage): CardMessage {
+  const base = (transformMessageBase(message) as unknown) as CardMessage
+  base.content = message.content
+  base.channelName = message.extra.channel_name
+  base.code = message.extra.code
+  base.author = transformUser(message.extra.author)
+  base.mention = {
+    user: message.extra.mention,
+    roles: message.extra.mention_roles,
+    all: message.extra.mention_all,
+    here: message.extra.mention_here,
+    channels: message.extra.nav_channels,
+  }
+  return base
+}
+
+export function transformSystemMessage(message: KHSystemMessage): any {
+  switch (message.extra.type) {
+    case 'message_btn_click':
+      break
+
+    default:
+      break
+  }
 }

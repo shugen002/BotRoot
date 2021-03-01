@@ -1,5 +1,5 @@
 import { User } from '../../types/common'
-import { KHUser } from '../../types/kaiheila/types'
+import { KHUser } from '../../types/kaiheila/common'
 
 export function transformUser(e: KHUser): User {
   const result: User = {

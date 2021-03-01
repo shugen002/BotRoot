@@ -5,11 +5,11 @@ import { ImageAttachment } from '../../types/attachment/ImageAttachment'
 import { VideoAttachment } from '../../types/attachment/VideoAttachment'
 import {
   KHAttachment,
-  KHAudioAttachment,
-  KHFileAttachment,
   KHImageAttachment,
   KHVideoAttachment,
-} from '../../types/kaiheila/kaiheila.type'
+  KHFileAttachment,
+  KHAudioAttachment,
+} from '../../types/kaiheila/attachment'
 
 export function transformAttachmentBase(
   attachment: KHAttachment

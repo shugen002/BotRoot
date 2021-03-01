@@ -1,3 +1,8 @@
+export interface KaiheilaEncryptPacket {
+  encrypt: string
+}
+
+export type KaiheilaWebhookRequest = KaiheilaEncryptPacket | KHPacket
 export enum KHOpcode {
   EVENT = 0,
   HELLO = 1,
@@ -11,6 +16,29 @@ export interface KHPacket {
   s: KHOpcode
   d: any
   sn?: number
+}
+
+interface KHWebhookChallenge {
+  verify_token: string
+  type: 255
+  channel_type: 'WEBHOOK_CHALLENGE'
+  challenge: string
+  msg_id: undefined
+}
+
+export interface KHEventBase {
+  channel_type: 'GROUP'
+  type: number
+  target_id: string
+  author_id: string
+  content: string
+  msg_id: string
+  msg_timestamp: number
+  nonce: string
+  verify_token?: string
+  extra: any
+
+  [key: string]: any
 }
 
 /**

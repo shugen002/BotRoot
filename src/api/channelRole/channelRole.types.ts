@@ -1,5 +1,5 @@
 import { User } from '../../types/common'
-import { KHUser } from '../../types/kaiheila/types'
+import { KHUser } from '../../types/kaiheila/common'
 
 export interface KHChannelRoleListResponse {
   permission_overwrites: {

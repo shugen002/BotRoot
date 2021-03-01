@@ -1,7 +1,6 @@
 import { Guild, User } from '../../types/common'
 import { KHAPIMultiPage } from '../../types/kaiheila/api'
-import { KHGuild } from '../../types/kaiheila/kaiheila.type'
-import { KHUser } from '../../types/kaiheila/types'
+import { KHGuild, KHUser } from '../../types/kaiheila/common'
 
 export interface KHGuildListResponse extends KHAPIMultiPage<KHGuild> {
   sort: {

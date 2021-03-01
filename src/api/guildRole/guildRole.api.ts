@@ -2,7 +2,7 @@ import { BotInstance } from '../../BotInstance'
 import RequestError from '../../models/Error/RequestError'
 import { Role } from '../../types/common'
 import { KHAPIResponse } from '../../types/kaiheila/api'
-import { KHRole } from '../../types/kaiheila/types'
+import { KHRole } from '../../types/kaiheila/common'
 import {
   KHGrantUserRoleResponse,
   KHRevokeUserRoleResponse,
