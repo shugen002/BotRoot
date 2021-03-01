@@ -1,6 +1,6 @@
-import { Guild, User } from '../../types/common'
+import { Guild, UserInGuildNonStandard } from '../../types/common'
 import { KHAPIMultiPage } from '../../types/kaiheila/api'
-import { KHGuild, KHUser } from '../../types/kaiheila/common'
+import { KHGuild, KHUserInGuild } from '../../types/kaiheila/common'
 
 export interface KHGuildListResponse extends KHAPIMultiPage<KHGuild> {
   sort: {
@@ -8,7 +8,7 @@ export interface KHGuildListResponse extends KHAPIMultiPage<KHGuild> {
   }
 }
 
-export interface KHGuildUserListResponse extends KHAPIMultiPage<KHUser> {
+export interface KHGuildUserListResponse extends KHAPIMultiPage<KHUserInGuild> {
   user_count: number
   online_count: number
   offline_count: number
@@ -25,5 +25,5 @@ export interface GuildListResponseInternal {
 }
 
 export interface GuildUserListInternal {
-  items: User[]
+  items: UserInGuildNonStandard[]
 }

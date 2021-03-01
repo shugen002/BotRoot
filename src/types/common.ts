@@ -1,6 +1,7 @@
 import { AxiosInstance } from 'axios'
 import { API } from '../api'
 import { MessageSource } from '../MessageSource/MessageSource'
+import { ButtonClickEvent } from './event/ButtonClickEvent'
 import { AudioMessage } from './message/AudioMessage'
 import { FileMessage } from './message/FileMessage'
 import { ImageMessage } from './message/ImageMessage'
@@ -8,11 +9,6 @@ import { KMarkdownMessage } from './message/KMarkDownMessage'
 import { TextMessage } from './message/TextMessage'
 import { VideoMessage } from './message/VideoMessage'
 
-/**
- * 用户
- *
- * 使用非标准属性时请做好没有的处理
- */
 export interface User {
   /**
    * 用户id
@@ -41,13 +37,23 @@ export interface User {
   /**
    * 用户在服务器的昵称
    */
+}
+
+export interface UserInGuild {
   nickname: string
   /**
    * 用户在当前服务器中的角色 id 组成的列表
    */
   roles?: number[]
+}
+/**
+ * 服务器中的用户，带有非标准属性
+ *
+ * 使用非标准属性时请做好没有的处理
+ */
+export interface UserInGuildNonStandard extends UserInGuild {
   /**
-   * 是否服务器主人
+   * 是否服务器主人 (非标准)
    */
   isMaster?: boolean
   /**
@@ -67,7 +73,7 @@ export interface User {
    */
   color?: number
   /**
-   * 角色设定
+   * 角色设定（非标准）
    */
   hoistInfo?: {
     color: number
@@ -75,7 +81,7 @@ export interface User {
     roleId: number
   }
   /**
-   * 正在玩的游戏
+   * 正在玩的游戏（非标准）
    */
   game?: {
     icon: string
@@ -85,7 +91,7 @@ export interface User {
     type: number
   }
   /**
-   * 正在听的歌
+   * 正在听的歌（非标准）
    */
   music?: {
     musicName: string
@@ -239,7 +245,7 @@ export interface Channel {
    * 针对用户在该频道的权限覆写规则组成的列表
    * TODO
    */
-  permissionUsers: User[]
+  permissionUsers: UserInGuildNonStandard[]
   /**
    * 权限设置是否与分组同步, 1 or 0
    */
@@ -270,6 +276,8 @@ export interface KaiheilaBot {
     event: 'kmarkdownMessage',
     listener: (event: KMarkdownMessage) => void
   ): this
+
+  on(event: 'buttonClick', listener: (event: ButtonClickEvent) => void): this
   /**
    * 未知的事件
    */

@@ -35,31 +35,18 @@ export interface KHUser {
   username: string
   avatar: string
   online: boolean
+  identify_num: string
+  bot?: boolean
+}
+
+export interface KHUserInGuild extends KHUser {
   nickname: string
+  roles?: number[]
   joined_at?: number
   active_time?: number
-  roles?: number[]
   is_master?: boolean
-  identify_num: string
   mobile_verified?: boolean
   color?: number
-  bot?: boolean
-  hoist_info?: {
-    color: number
-    name: string
-    role_id: number
-  }
-  game?: {
-    icon: string
-    id: number
-    name: string
-    start_time: number
-    type: number
-  }
-  tag_info?: {
-    color: string
-    text: string
-  }
   os?: string
 }
 

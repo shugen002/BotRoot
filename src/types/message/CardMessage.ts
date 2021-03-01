@@ -1,10 +1,10 @@
-import { User } from '../common'
+import { UserInGuildNonStandard } from '../common'
 import { MessageType } from '../MessageType'
 import { MessageBase } from './MessageBase'
 
 export interface CardMessage extends MessageBase {
   type: MessageType.card
-  author: User
+  author: UserInGuildNonStandard
   mention: {
     user: string[]
     roles: string[]

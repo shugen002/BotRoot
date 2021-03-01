@@ -1,10 +1,10 @@
-import { User } from '../common'
+import { UserInGuildNonStandard } from '../common'
 import { MessageType } from '../MessageType'
 import { MessageBase } from './MessageBase'
 
 export interface KMarkdownMessage extends MessageBase {
   type: MessageType.kMarkdown
-  author: User
+  author: UserInGuildNonStandard
   mention: {
     user: string[]
     roles: string[]

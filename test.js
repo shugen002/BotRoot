@@ -28,4 +28,8 @@ bot.on('textMessage', (e) => {
   console.log(e)
 })
 
+bot.on('buttonClick', (e) => {
+  console.log(e)
+})
+
 global.botInstance = bot

@@ -11,6 +11,7 @@ import {
   KHCardMessage,
   KHSystemMessage,
 } from '../../types/kaiheila/message'
+import { KHMessageEventBase } from '../../types/kaiheila/packet'
 import { AudioMessage } from '../../types/message/AudioMessage'
 import { CardMessage } from '../../types/message/CardMessage'
 import { FileMessage } from '../../types/message/FileMessage'
@@ -25,7 +26,8 @@ import {
   transformVideoAttachment,
   transfromFileAttachment,
 } from './attachment'
-import { transformUser } from './User'
+import { transformEvent } from './event'
+import { transformUserInGuildNonStandard } from './User'
 
 export interface TransformResult {
   type: string
@@ -35,7 +37,7 @@ export interface TransformResult {
 export function transformMessage(message: KHMessage): TransformResult {
   switch (message.type) {
     case 255:
-      return { type: 'systemMessage', data: cloneDeep(message) }
+      return { type: 'systemMessage', data: transformSystemMessage(message) }
       break
     case 1:
       return { type: 'textMessage', data: transformTextMessage(message) }
@@ -68,7 +70,7 @@ export function transformMessage(message: KHMessage): TransformResult {
 }
 
 export function transformMessageBase(
-  message: KHEventBase,
+  message: KHMessageEventBase,
   reply = false
 ): MessageBase {
   const base = {
@@ -105,7 +107,7 @@ export function transformTextMessage(
   base.content = message.content
   if (reply) {
     base.channelName = ''
-    base.author = transformUser(message.author)
+    base.author = transformUserInGuildNonStandard(message.author)
     base.code = message.code
     base.mention = {
       user: message.mention,
@@ -116,7 +118,7 @@ export function transformTextMessage(
   } else {
     base.channelName = message.extra.channel_name
     base.code = message.extra.code
-    base.author = transformUser(message.extra.author)
+    base.author = transformUserInGuildNonStandard(message.extra.author)
     base.mention = {
       user: message.extra.mention,
       roles: message.extra.mention_roles,
@@ -139,28 +141,28 @@ export function transformImageMessage(message: KHImageMessage): ImageMessage {
   const base = (transformMessageBase(message) as unknown) as ImageMessage
   base.content = message.content
   base.code = message.extra.code
-  base.author = transformUser(message.extra.author)
+  base.author = transformUserInGuildNonStandard(message.extra.author)
   base.attachment = transformImageAttachment(message.extra.attachments)
   return base
 }
 
 export function transformVideoMessage(message: KHVideoMessage): VideoMessage {
   const base = (transformMessageBase(message) as unknown) as VideoMessage
-  base.author = transformUser(message.extra.author)
+  base.author = transformUserInGuildNonStandard(message.extra.author)
   base.attachment = transformVideoAttachment(message.extra.attachments)
   return base
 }
 
 export function transformFileMessage(message: KHFileMessage): FileMessage {
   const base = (transformMessageBase(message) as unknown) as FileMessage
-  base.author = transformUser(message.extra.author)
+  base.author = transformUserInGuildNonStandard(message.extra.author)
   base.attachment = transfromFileAttachment(message.extra.attachments)
   return base
 }
 
 export function transformAudioMessage(message: KHAudioMessage): AudioMessage {
   const base = (transformMessageBase(message) as unknown) as AudioMessage
-  base.author = transformUser(message.extra.author)
+  base.author = transformUserInGuildNonStandard(message.extra.author)
   base.attachment = transformAudioAttachment(message.extra.attachments)
   return base
 }
@@ -172,7 +174,7 @@ export function transformKMarkdownMessage(
   base.content = message.content
   base.channelName = message.extra.channel_name
   base.code = message.extra.code
-  base.author = transformUser(message.extra.author)
+  base.author = transformUserInGuildNonStandard(message.extra.author)
   base.mention = {
     user: message.extra.mention,
     roles: message.extra.mention_roles,
@@ -188,7 +190,7 @@ export function transformCardMessage(message: KHCardMessage): CardMessage {
   base.content = message.content
   base.channelName = message.extra.channel_name
   base.code = message.extra.code
-  base.author = transformUser(message.extra.author)
+  base.author = transformUserInGuildNonStandard(message.extra.author)
   base.mention = {
     user: message.extra.mention,
     roles: message.extra.mention_roles,
@@ -200,11 +202,5 @@ export function transformCardMessage(message: KHCardMessage): CardMessage {
 }
 
 export function transformSystemMessage(message: KHSystemMessage): any {
-  switch (message.extra.type) {
-    case 'message_btn_click':
-      break
-
-    default:
-      break
-  }
+  return transformEvent(message)
 }

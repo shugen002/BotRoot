@@ -26,7 +26,7 @@ interface KHWebhookChallenge {
   msg_id: undefined
 }
 
-export interface KHEventBase {
+export interface KHMessageEventBase {
   channel_type: 'GROUP'
   type: number
   target_id: string

@@ -1,5 +1,5 @@
-import { User } from '../../types/common'
-import { KHUser } from '../../types/kaiheila/common'
+import { UserInGuildNonStandard } from '../../types/common'
+import { KHUserInGuild } from '../../types/kaiheila/common'
 
 export interface KHChannelRoleListResponse {
   permission_overwrites: {
@@ -8,7 +8,7 @@ export interface KHChannelRoleListResponse {
     deny: number
   }[]
   permission_users: {
-    user: KHUser
+    user: KHUserInGuild
     allow: number
     deny: number
   }[]
@@ -28,7 +28,7 @@ export interface ChannelRoleListResponseInternal {
     deny: number
   }[]
   permissionUsers: {
-    user: User
+    user: UserInGuildNonStandard
     allow: number
     deny: number
   }[]

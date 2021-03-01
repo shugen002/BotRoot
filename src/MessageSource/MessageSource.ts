@@ -47,6 +47,9 @@ export class MessageSource extends EventEmitter implements MessageSource {
 
   protected eventProcess(packet: KHEventPacket): void {
     const result = transformMessage(packet.d)
+    if (result.type === 'systemMessage') {
+      this.self.emit(result.data.type, result.data)
+    }
     this.self.emit(result.type, result.data)
   }
 }

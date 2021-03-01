@@ -11,7 +11,7 @@ export class UserAPI {
   constructor(self: BotInstance) {
     this.self = self
   }
-  async getCurrentUserInfo(): Promise<CurrentUserInfoInternal> {
+  async me(): Promise<CurrentUserInfoInternal> {
     const data = (await this.self.get('v3/user/me', {}))
       .data as KHAPIResponse<KHGetCurrentUserInfoResponse>
     if (data.code === 0) {

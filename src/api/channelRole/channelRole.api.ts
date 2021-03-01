@@ -1,5 +1,5 @@
 import { BotInstance } from '../../BotInstance'
-import { transformUser } from '../../helper/transformer/User'
+import { transformUserInGuildNonStandard } from '../../helper/transformer/User'
 import RequestError from '../../models/Error/RequestError'
 import { KHAPIResponse } from '../../types/kaiheila/api'
 import {
@@ -36,7 +36,7 @@ export class ChannelRoleAPI {
         }),
         permissionUsers: data.data.permission_users.map((e) => {
           return {
-            user: transformUser(e.user),
+            user: transformUserInGuildNonStandard(e.user),
             allow: e.allow,
             deny: e.deny,
           }

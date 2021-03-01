@@ -5,19 +5,16 @@ import {
   KHAudioAttachment,
 } from './attachment'
 import { KHAuthor } from './common'
-import { KHEventBase } from './packet'
+import { KHEvent } from './event'
+import { KHMessageEventBase } from './packet'
 
-export interface KHSystemMessage extends KHEventBase {
+export interface KHSystemMessage<EventType = KHEvent>
+  extends KHMessageEventBase {
   type: 255
   author_id: '1'
-  extra: {
-    type: string
-    body: any
-  }
-  nonce: any
+  extra: EventType
 }
-
-export interface KHTextMessage extends KHEventBase {
+export interface KHTextMessage extends KHMessageEventBase {
   type: 1
   extra: {
     type: 1
@@ -36,7 +33,7 @@ export interface KHTextMessage extends KHEventBase {
 /**
  * 图片消息
  */
-export interface KHImageMessage extends KHEventBase {
+export interface KHImageMessage extends KHMessageEventBase {
   type: 2
   /**
    * 图片URL
@@ -54,7 +51,7 @@ export interface KHImageMessage extends KHEventBase {
 /**
  * 视频消息
  */
-export interface KHVideoMessage extends KHEventBase {
+export interface KHVideoMessage extends KHMessageEventBase {
   type: 3
   extra: {
     type: 3
@@ -67,7 +64,7 @@ export interface KHVideoMessage extends KHEventBase {
 /**
  * 文件消息
  */
-export interface KHFileMessage extends KHEventBase {
+export interface KHFileMessage extends KHMessageEventBase {
   type: 4
   extra: {
     type: 4
@@ -81,7 +78,7 @@ export interface KHFileMessage extends KHEventBase {
 /**
  * 音频消息
  */
-export interface KHAudioMessage extends KHEventBase {
+export interface KHAudioMessage extends KHMessageEventBase {
   type: 8
   extra: {
     type: 8
@@ -90,7 +87,7 @@ export interface KHAudioMessage extends KHEventBase {
   }
 }
 
-export interface KHKMarkDownMessage extends KHEventBase {
+export interface KHKMarkDownMessage extends KHMessageEventBase {
   type: 9
   extra: {
     type: 9
@@ -119,7 +116,7 @@ export interface KHKMarkDownMessage extends KHEventBase {
   }
 }
 
-export interface KHCardMessage extends KHEventBase {
+export interface KHCardMessage extends KHMessageEventBase {
   type: 10
   extra: {
     type: 10

@@ -1,9 +1,9 @@
 import { BotInstance } from '../../BotInstance'
-import { transformUser } from '../../helper/transformer/User'
+import { transformUserInGuildNonStandard } from '../../helper/transformer/User'
 import RequestError from '../../models/Error/RequestError'
-import { User } from '../../types/common'
+import { UserInGuildNonStandard } from '../../types/common'
 import { KHAPIResponse } from '../../types/kaiheila/api'
-import { KHUser } from '../../types/kaiheila/common'
+import { KHUserInGuild } from '../../types/kaiheila/common'
 import { MessageType } from '../../types/MessageType'
 import {
   KHMessageCreateResponse,
@@ -101,15 +101,18 @@ export class MessageAPI {
    * @param msgId 频道消息的id
    * @param emoji emoji的id, 可以为GuilEmoji或者Emoji
    */
-  async reactionList(msgId: string, emoji: string): Promise<User[]> {
+  async reactionList(
+    msgId: string,
+    emoji: string
+  ): Promise<UserInGuildNonStandard[]> {
     const data = (
       await this.self.get('v3/message/reaction-list', {
         msg_id: msgId,
         emoji,
       })
-    ).data as KHAPIResponse<KHUser[]>
+    ).data as KHAPIResponse<KHUserInGuild[]>
     if (data.code === 0) {
-      return data.data.map((e) => transformUser(e))
+      return data.data.map((e) => transformUserInGuildNonStandard(e))
     } else {
       throw new RequestError(data.code, data.message)
     }

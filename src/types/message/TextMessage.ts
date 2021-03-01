@@ -1,10 +1,10 @@
-import { User } from '../common'
+import { UserInGuildNonStandard } from '../common'
 import { MessageType } from '../MessageType'
 import { MessageBase } from './MessageBase'
 
 export interface TextMessage extends MessageBase {
   type: MessageType.text
-  author: User
+  author: UserInGuildNonStandard
   quote?: TextMessage
   channelName?: string
   code: string

@@ -1,5 +1,5 @@
 import { BotInstance } from '../../BotInstance'
-import { transformUser } from '../../helper/transformer/User'
+import { transformUserInGuildNonStandard } from '../../helper/transformer/User'
 import RequestError from '../../models/Error/RequestError'
 import { KHAPIResponse } from '../../types/kaiheila/api'
 import {
@@ -93,7 +93,7 @@ export class GuildAPI {
     if (data.code === 0) {
       return {
         items: data.data.items.map((e) => {
-          return transformUser(e)
+          return transformUserInGuildNonStandard(e)
         }),
       }
     } else {
