@@ -3,21 +3,14 @@
     "target": "ESNext",
     "module": "CommonJS",
     "moduleResolution": "Node",
-    "lib": [
-      "ESNext",
-      "ESNext.AsyncIterable"
-    ],
+    "lib": ["ESNext", "ESNext.AsyncIterable"],
     "outDir": "dist",
     "esModuleInterop": true,
     "sourceMap": true,
     "strict": true,
     "experimentalDecorators": true,
-    "types": [
-      "@types/node"
-    ],
+    "types": ["@types/node"],
     "declaration": true
   },
-  "include": [
-    "src"
-  ]
+  "include": ["src"]
 }
