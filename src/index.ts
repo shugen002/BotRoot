@@ -1,5 +1,4 @@
 import { BotInstance } from './BotInstance'
-export * from './types/index'
-export * from './types/common'
+export * from './types'
 
 export const KaiheilaBot = BotInstance

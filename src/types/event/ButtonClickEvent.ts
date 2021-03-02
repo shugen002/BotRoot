@@ -1,3 +1,5 @@
+import { User } from "../common";
+
 export interface ButtonClickEvent {
   msgId: string
   msgTimestamp: number
@@ -7,4 +9,6 @@ export interface ButtonClickEvent {
   channelId: string
   targetMsgId: string
   value: string
+  userId: string
+  user: User
 }

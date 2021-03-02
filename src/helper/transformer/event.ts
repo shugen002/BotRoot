@@ -3,6 +3,7 @@ import { ButtonClickEvent } from '../../types/event/ButtonClickEvent'
 import { EventBase } from '../../types/event/EventBase'
 import { KHButtonClickEvent } from '../../types/kaiheila/event'
 import { KHSystemMessage } from '../../types/kaiheila/message'
+import { transformUser } from './User'
 
 export function transformEvent(message: KHSystemMessage): EventBase {
   switch (message.extra.type) {
@@ -34,5 +35,7 @@ export function transformButtonClickEvent(
     channelId: message.extra.body.target_id,
     targetMsgId: message.extra.body.msg_id,
     value: message.extra.body.value,
+    user: transformUser(message.extra.body.user_info),
+    userId: message.extra.body.user_id,
   }
 }
