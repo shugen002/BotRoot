@@ -27,7 +27,7 @@ import {
   transfromFileAttachment,
 } from './attachment'
 import { transformEvent } from './event'
-import { transformUserInGuildNonStandard } from './User'
+import { transformUserInGuildNonStandard } from './user'
 
 export interface TransformResult {
   type: string

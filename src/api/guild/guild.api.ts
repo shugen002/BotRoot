@@ -1,5 +1,5 @@
 import { BotInstance } from '../../BotInstance'
-import { transformUserInGuildNonStandard } from '../../helper/transformer/User'
+import { transformUserInGuildNonStandard } from '../../helper/transformer/user'
 import RequestError from '../../models/Error/RequestError'
 import { KHAPIResponse } from '../../types/kaiheila/api'
 import {

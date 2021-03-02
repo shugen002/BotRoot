@@ -6,7 +6,7 @@ import WebSocketSource from './MessageSource/WebSocketSource'
 import { API } from './api'
 import { URLSearchParams } from 'url'
 import { MessageSource } from './MessageSource/MessageSource'
-import { KaiheilaBot } from './types/common'
+import { KaiheilaBotInterface } from './types/common'
 
 export interface BotConfig {
   mode: 'webhook' | 'websocket' | 'pc'
@@ -36,7 +36,7 @@ function DefaultConfig() {
   }
 }
 
-export class BotInstance extends EventEmitter implements KaiheilaBot {
+export class BotInstance extends EventEmitter implements KaiheilaBotInterface {
   config: BotConfig
   axios: AxiosInstance
   messageSource: MessageSource

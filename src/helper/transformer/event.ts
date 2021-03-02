@@ -3,7 +3,7 @@ import { ButtonClickEvent } from '../../types/event/ButtonClickEvent'
 import { EventBase } from '../../types/event/EventBase'
 import { KHButtonClickEvent } from '../../types/kaiheila/event'
 import { KHSystemMessage } from '../../types/kaiheila/message'
-import { transformUser } from './User'
+import { transformUser } from './user'
 
 export function transformEvent(message: KHSystemMessage): EventBase {
   switch (message.extra.type) {

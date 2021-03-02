@@ -252,7 +252,7 @@ export interface Channel {
   permissionSync: number
 }
 
-export interface KaiheilaBot {
+export interface KaiheilaBotInterface {
   /**
    * 目前开黑啦官方提供的所有API
    */
