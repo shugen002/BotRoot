@@ -40,7 +40,7 @@ export default class WebSocketSource extends MessageSource {
 
   private async getGateWay() {
     try {
-      const url = (await this.self.API.gateway.index(this.compress ? 1 : 0)).url
+      const url = (await this.botInstance.API.gateway.index(this.compress ? 1 : 0)).url
       if (this.stage === 1) {
         this.url = url
         this.nextStage()

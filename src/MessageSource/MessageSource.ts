@@ -13,10 +13,10 @@ export interface MessageSource extends EventEmitter {
 }
 
 export class MessageSource extends EventEmitter implements MessageSource {
-  protected self: BotInstance
-  constructor(self: BotInstance) {
+  protected botInstance: BotInstance
+  constructor(botInstance: BotInstance) {
     super()
-    this.self = self
+    this.botInstance = botInstance
   }
   async connect(): Promise<boolean> {
     return false
@@ -48,8 +48,8 @@ export class MessageSource extends EventEmitter implements MessageSource {
   protected eventProcess(packet: KHEventPacket): void {
     const result = transformMessage(packet.d)
     if (result.type === 'systemMessage') {
-      this.self.emit(result.data.type, result.data)
+      this.botInstance.emit(result.data.type, result.data)
     }
-    this.self.emit(result.type, result.data)
+    this.botInstance.emit(result.type, result.data)
   }
 }
