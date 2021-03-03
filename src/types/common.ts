@@ -266,6 +266,7 @@ export interface KaiheilaBotInterface {
    */
   axios: AxiosInstance
   on(event: string, listener: (event: unknown) => void): this
+  on(event: 'allMessages', listener: (event: unknown) => void): this
   on(event: 'systemMessage', listener: (event: unknown) => void): this
   on(event: 'textMessage', listener: (event: TextMessage) => void): this
   on(event: 'imageMessage', listener: (event: ImageMessage) => void): this
