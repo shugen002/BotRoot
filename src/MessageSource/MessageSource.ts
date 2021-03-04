@@ -33,8 +33,8 @@ export class MessageSource extends EventEmitter implements MessageSource {
         this.buffer.shift()
       }
       while (this.buffer.length > 0 && this.buffer[0].sn === this.sn + 1) {
-        const packet = this.buffer.shift()
-        this.emit('message', cloneDeep(packet?.d))
+        const packet = this.buffer.shift() as KHEventPacket<any>
+        this.emit('message', cloneDeep(packet.d))
         this.eventProcess((packet as unknown) as KHEventPacket)
         while (this.buffer.length > 0 && this.buffer[0].sn < this.sn + 1) {
           this.buffer.shift()
