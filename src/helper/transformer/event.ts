@@ -36,9 +36,7 @@ export function transformButtonClickEvent(
     channelId: message.extra.body.target_id,
     targetMsgId: message.extra.body.msg_id,
     value: message.extra.body.value,
-    user: transformUserInGuild(
-      message.extra.body.user_info as KHUser & KHUserInGuild
-    ), // Possibly need change in the future
+    user: transformUser(message.extra.body.user_info), // Possibly need change in the future
     userId: message.extra.body.user_id,
   }
 }
