@@ -1,4 +1,4 @@
-import { KHUser } from './common'
+import { KHUser, KHUserInGuild } from './common'
 
 export interface KHEvent {
   type: string
@@ -14,6 +14,6 @@ export interface KHButtonClickEvent extends KHEvent {
     user_id: string
     value: string
     target_id: string
-    user_info: KHUser
+    user_info: KHUser & Partial<KHUserInGuild>
   }
 }
