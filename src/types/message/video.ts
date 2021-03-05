@@ -1,7 +1,7 @@
 import { VideoAttachment } from '../attachment/VideoAttachment'
 import { UserInGuildNonStandard } from '../common'
 import { MessageType } from '../MessageType'
-import { MessageBase } from './MessageBase'
+import { MessageBase } from './base'
 
 export interface VideoMessage extends MessageBase {
   type: MessageType.video

@@ -1,18 +1,18 @@
 import { UserInGuildNonStandard } from '../common'
 import { MessageType } from '../MessageType'
-import { MessageBase } from './MessageBase'
+import { MessageBase } from './base'
 
-export interface CardMessage extends MessageBase {
-  type: MessageType.card
+export interface TextMessage extends MessageBase {
+  type: MessageType.text
   author: UserInGuildNonStandard
+  quote?: TextMessage
+  channelName?: string
+  code: string
+  content: string
   mention: {
     user: string[]
     roles: string[]
     all: boolean
     here: boolean
-    channels: string[]
   }
-  channelName: string
-  content: string
-  code: string
 }

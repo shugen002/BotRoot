@@ -1,7 +1,7 @@
 import { FileAttachment } from '../attachment/FileAttachment'
 import { UserInGuildNonStandard } from '../common'
 import { MessageType } from '../MessageType'
-import { MessageBase } from './MessageBase'
+import { MessageBase } from './base'
 
 export interface FileMessage extends MessageBase {
   type: MessageType.file

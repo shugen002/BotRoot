@@ -12,14 +12,14 @@ import {
   KHSystemMessage,
 } from '../../types/kaiheila/message'
 import { KHMessageEventBase } from '../../types/kaiheila/packet'
-import { AudioMessage } from '../../types/message/AudioMessage'
-import { CardMessage } from '../../types/message/CardMessage'
-import { FileMessage } from '../../types/message/FileMessage'
-import { ImageMessage } from '../../types/message/ImageMessage'
-import { KMarkdownMessage } from '../../types/message/KMarkDownMessage'
-import { MessageBase } from '../../types/message/MessageBase'
-import { TextMessage } from '../../types/message/TextMessage'
-import { VideoMessage } from '../../types/message/VideoMessage'
+import { AudioMessage } from '../../types/message/audio'
+import { CardMessage } from '../../types/message/card'
+import { FileMessage } from '../../types/message/file'
+import { ImageMessage } from '../../types/message/image'
+import { KMarkdownMessage } from '../../types/message/kmarkdown'
+import { MessageBase } from '../../types/message/base'
+import { TextMessage } from '../../types/message/text'
+import { VideoMessage } from '../../types/message/video'
 import {
   transformAudioAttachment,
   transformImageAttachment,

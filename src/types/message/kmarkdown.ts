@@ -1,6 +1,6 @@
 import { UserInGuildNonStandard } from '../common'
 import { MessageType } from '../MessageType'
-import { MessageBase } from './MessageBase'
+import { MessageBase } from './base'
 
 export interface KMarkdownMessage extends MessageBase {
   type: MessageType.kMarkdown
