@@ -1,7 +1,7 @@
-import { ImageAttachment } from '../attachment/ImageAttachment'
+import { ImageAttachment } from '../attachment/image'
 import { UserInGuildNonStandard } from '../common'
 import { MessageType } from '../MessageType'
-import { MessageBase } from './MessageBase'
+import { MessageBase } from './base'
 
 export interface ImageMessage extends MessageBase {
   type: MessageType.image

@@ -1,13 +1,13 @@
 import { AxiosInstance } from 'axios'
 import { API } from '../api'
 import { MessageSource } from '../MessageSource/MessageSource'
-import { ButtonClickEvent } from './event/ButtonClickEvent'
-import { AudioMessage } from './message/AudioMessage'
-import { FileMessage } from './message/FileMessage'
-import { ImageMessage } from './message/ImageMessage'
-import { KMarkdownMessage } from './message/KMarkDownMessage'
-import { TextMessage } from './message/TextMessage'
-import { VideoMessage } from './message/VideoMessage'
+import { ButtonClickEvent } from './event/button-click'
+import { AudioMessage } from './message/audio'
+import { FileMessage } from './message/file'
+import { ImageMessage } from './message/image'
+import { KMarkdownMessage } from './message/kmarkdown'
+import { TextMessage } from './message/text'
+import { VideoMessage } from './message/video'
 
 export interface User {
   /**

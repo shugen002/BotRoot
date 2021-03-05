@@ -1,6 +1,6 @@
 import { cloneDeep } from 'lodash'
-import { ButtonClickEvent } from '../../types/event/ButtonClickEvent'
-import { EventBase } from '../../types/event/EventBase'
+import { ButtonClickEvent } from '../../types/event/button-click'
+import { EventBase } from '../../types/event/base'
 import { KHButtonClickEvent } from '../../types/kaiheila/event'
 import { KHSystemMessage } from '../../types/kaiheila/message'
 import { transformUser } from './user'

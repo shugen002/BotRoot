@@ -1,8 +1,8 @@
-import { AttachmentBase } from '../../types/attachment/AttachmentBase'
-import { AudioAttachment } from '../../types/attachment/AudioAttachment'
-import { FileAttachment } from '../../types/attachment/FileAttachment'
-import { ImageAttachment } from '../../types/attachment/ImageAttachment'
-import { VideoAttachment } from '../../types/attachment/VideoAttachment'
+import { AttachmentBase } from '../../types/attachment/base'
+import { AudioAttachment } from '../../types/attachment/audio'
+import { FileAttachment } from '../../types/attachment/file'
+import { ImageAttachment } from '../../types/attachment/image'
+import { VideoAttachment } from '../../types/attachment/video'
 import {
   KHAttachment,
   KHImageAttachment,
