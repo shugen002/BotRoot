@@ -39,7 +39,7 @@ export interface User {
    */
 }
 
-export interface UserInGuild {
+export interface UserInGuild extends User {
   nickname: string
   /**
    * 用户在当前服务器中的角色 id 组成的列表

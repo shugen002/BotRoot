@@ -29,7 +29,7 @@ export class DirectMessageAPI {
   async create(
     type: MessageType,
     targetId: string,
-    chatCode: string,
+    chatCode: string | undefined,
     content: string,
     quote?: string
   ): Promise<DirectMessageCreateResponseInternal> {
