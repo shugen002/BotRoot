@@ -1,4 +1,4 @@
-import { AttachmentBase } from './AttachmentBase'
+import { AttachmentBase } from './base'
 
 export interface AudioAttachment extends AttachmentBase {
   type: string

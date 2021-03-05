@@ -1,4 +1,4 @@
-import { AudioAttachment } from '../attachment/AudioAttachment'
+import { AudioAttachment } from '../attachment/audio'
 import { UserInGuildNonStandard } from '../common'
 import { MessageType } from '../MessageType'
 import { MessageBase } from './base'

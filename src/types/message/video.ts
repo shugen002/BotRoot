@@ -1,4 +1,4 @@
-import { VideoAttachment } from '../attachment/VideoAttachment'
+import { VideoAttachment } from '../attachment/video'
 import { UserInGuildNonStandard } from '../common'
 import { MessageType } from '../MessageType'
 import { MessageBase } from './base'

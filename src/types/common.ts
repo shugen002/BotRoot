@@ -1,7 +1,7 @@
 import { AxiosInstance } from 'axios'
 import { API } from '../api'
 import { MessageSource } from '../MessageSource/MessageSource'
-import { ButtonClickEvent } from './event/ButtonClickEvent'
+import { ButtonClickEvent } from './event/button-click'
 import { AudioMessage } from './message/audio'
 import { FileMessage } from './message/file'
 import { ImageMessage } from './message/image'

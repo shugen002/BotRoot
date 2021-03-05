@@ -1,4 +1,4 @@
-import { FileAttachment } from '../attachment/FileAttachment'
+import { FileAttachment } from '../attachment/file'
 import { UserInGuildNonStandard } from '../common'
 import { MessageType } from '../MessageType'
 import { MessageBase } from './base'
