@@ -77,19 +77,24 @@ export class GuildAPI {
     page?: number,
     pageSize?: number
   ): Promise<GuildUserListInternal> {
-    const data = (
-      await this.self.get('v3/guild/user-list', {
-        guild_id: guildId,
-        channel_id: channelId,
-        search: search,
-        role_id: roleId,
-        mobile_verified: mobileVerified,
-        active_time: activeTime,
-        joined_at: joinedAt,
-        page: page,
-        page_size: pageSize,
-      })
-    ).data as KHAPIResponse<KHGuildUserListResponse>
+    const params: {
+      [key: string]: any
+    } = {
+      guild_id: guildId,
+      channel_id: channelId,
+      search: search,
+      role_id: roleId,
+      mobile_verified: mobileVerified,
+      active_time: activeTime,
+      joined_at: joinedAt,
+      page: page,
+      page_size: pageSize,
+    }
+    Object.keys(params).forEach((key) =>
+      params[key] === undefined ? delete params[key] : {}
+    )
+    const data = (await this.self.get('v3/guild/user-list', params))
+      .data as KHAPIResponse<KHGuildUserListResponse>
     if (data.code === 0) {
       return {
         items: data.data.items.map((e) => {
