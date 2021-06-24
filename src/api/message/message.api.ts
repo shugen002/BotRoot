@@ -63,13 +63,15 @@ export class MessageAPI {
   async update(
     msgId: string,
     content: string,
-    quote?: string
+    quote?: string,
+    tempTargetId?: string
   ): Promise<boolean> {
     const data = (
       await this.self.post('v3/message/update', {
         msg_id: msgId,
-        content,
-        quote,
+        content: content,
+        quote: quote,
+        temp_target_id: tempTargetId,
       })
     ).data as KHAPIResponse<[]>
     if (data.code === 0) {

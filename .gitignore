@@ -6,3 +6,4 @@ ecosystem.config.js
 dist
 debug.log
 .idea
+.DS_Store
