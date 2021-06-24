@@ -59,9 +59,9 @@ export class InviteAPI {
         guild_id: guildId,
         channel_id: channelId,
       })
-    ).data as KHAPIResponse<boolean>
+    ).data as KHAPIResponse<null>
     if (data.code === 0) {
-      return data.data
+      return true
     } else {
       throw new RequestError(data.code, data.message)
     }

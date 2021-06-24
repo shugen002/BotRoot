@@ -2,6 +2,7 @@ import { BotInstance } from '../../BotInstance'
 import { transformUserInGuildNonStandard } from '../../helper/transformer/user'
 import RequestError from '../../models/Error/RequestError'
 import { KHAPIResponse } from '../../types/kaiheila/api'
+import { KHChannelViewResponse } from './channel.types'
 
 export class ChannelAPI {
   private self: BotInstance
@@ -31,9 +32,9 @@ export class ChannelAPI {
       await this.self.get('v3/channel/view', {
         target_id: channelId,
       })
-    ).data as KHAPIResponse<any>
+    ).data as KHAPIResponse<KHChannelViewResponse>
     if (data.code === 0) {
-      return data
+      return data.data
     } else {
       throw new RequestError(data.code, data.message)
     }
@@ -56,9 +57,9 @@ export class ChannelAPI {
         limit_amount: limitAmount,
         voice_quality: voiceQuality,
       })
-    ).data as KHAPIResponse<any>
+    ).data as KHAPIResponse<KHChannelViewResponse>
     if (data.code === 0) {
-      return data
+      return data.data
     } else {
       throw new RequestError(data.code, data.message)
     }
@@ -69,9 +70,9 @@ export class ChannelAPI {
       await this.self.post('v3/channel/delete', {
         channel_id: channelId,
       })
-    ).data as KHAPIResponse<boolean>
+    ).data as KHAPIResponse<null>
     if (data.code === 0) {
-      return data
+      return true
     } else {
       throw new RequestError(data.code, data.message)
     }
@@ -83,9 +84,9 @@ export class ChannelAPI {
         target_id: channelId,
         user_ids: userIds,
       })
-    ).data as KHAPIResponse<boolean>
+    ).data as KHAPIResponse<null>
     if (data.code === 0) {
-      return data
+      return true
     } else {
       throw new RequestError(data.code, data.message)
     }
