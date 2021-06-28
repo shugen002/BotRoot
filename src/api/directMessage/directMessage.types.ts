@@ -1,4 +1,4 @@
-export interface KHDirCstMessageCreateResponse {
+export interface KHDirectMessageCreateResponse {
   msg_id: string
   msg_timestamp: number
 }

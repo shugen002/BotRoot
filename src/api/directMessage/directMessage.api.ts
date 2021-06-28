@@ -6,7 +6,7 @@ import { KHAPIResponse } from '../../types/kaiheila/api'
 import { KHUserInGuild } from '../../types/kaiheila/common'
 import { MessageType } from '../../types/MessageType'
 import {
-  KHDirCstMessageCreateResponse,
+  KHDirectMessageCreateResponse,
   DirectMessageCreateResponseInternal,
 } from './directMessage.types'
 
@@ -42,7 +42,7 @@ export class DirectMessageAPI {
         chat_code: chatCode,
         nonce: Math.random(),
       })
-    ).data as KHAPIResponse<KHDirCstMessageCreateResponse>
+    ).data as KHAPIResponse<KHDirectMessageCreateResponse>
     if (data.code === 0) {
       return {
         msgId: data.data.msg_id,
