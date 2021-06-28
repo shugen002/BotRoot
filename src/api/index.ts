@@ -8,6 +8,7 @@ import { GuildAPI } from './guild'
 import { GuildMuteAPI } from './guildMute'
 import { GuildRoleAPI } from './guildRole/guildRole.api'
 import { IntimacyAPI } from './intimacy/intimacy.api'
+import { InviteAPI } from './invite'
 import { MessageAPI } from './message'
 import { UserAPI } from './user'
 import { UserChatAPI } from './userChat'
@@ -25,6 +26,7 @@ export class API {
   guildRole: GuildRoleAPI
   intimacy: IntimacyAPI
   directMessage: DirectMessageAPI
+  invite: InviteAPI
   constructor(self: BotInstance) {
     this.guild = new GuildAPI(self)
     this.guildMute = new GuildMuteAPI(self)
@@ -38,5 +40,6 @@ export class API {
     this.intimacy = new IntimacyAPI(self)
     this.directMessage = new DirectMessageAPI(self)
     this.channel = new ChannelAPI(self)
+    this.invite = new InviteAPI(self)
   }
 }
