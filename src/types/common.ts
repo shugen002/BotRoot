@@ -208,7 +208,7 @@ export interface Channel {
   /**
    * 创建者id
    */
-  userId: string
+  masterId: string
   /**
    * 服务器id
    */
@@ -220,7 +220,7 @@ export interface Channel {
   /**
    * 是否为分组
    */
-  isCategory: number
+  isCategory: boolean
   /**
    * 上级分组的id
    */
@@ -236,20 +236,28 @@ export interface Channel {
   /**
    * 频道类型: 1 文字频道, 2 语音频道
    */
-  type: string
+  type: number
   /**
    * 针对角色在该频道的权限覆写规则组成的列表
    */
-  permissionOverwrites: string
+  permissionOverwrites: { roldId: number; allow: number; deny: number }[]
   /**
    * 针对用户在该频道的权限覆写规则组成的列表
    * TODO
    */
-  permissionUsers: UserInGuildNonStandard[]
+  permissionUsers: {
+    allow: number
+    deny: number
+    user: UserInGuildNonStandard
+  }[]
   /**
    * 权限设置是否与分组同步, 1 or 0
    */
   permissionSync: number
+  /**
+   * 语音服务器地址，`HOST:PORT`的格式
+   */
+  serverUrl?: string
 }
 
 export interface KaiheilaBotInterface {

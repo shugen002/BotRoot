@@ -123,4 +123,21 @@ export interface KHAuthor {
 
 export interface KHemoji {}
 
-export interface KHChannel {}
+export interface KHChannel {
+  guild_id: string
+  id: string
+  is_category: boolean
+  level: number
+  limit_amount: number
+  master_id: string
+  name: string
+  parent_id: string
+  permission_overwrites: { role_id: number; allow: number; deny: number }[]
+  permission_sync: number
+  permission_users: { user: KHUserInGuild; allow: number; deny: number }[]
+  slow_mode: number
+  topic: string
+  type: number
+  user_id: string
+  server_url: string
+}

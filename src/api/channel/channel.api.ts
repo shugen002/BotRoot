@@ -1,8 +1,13 @@
 import { BotInstance } from '../../BotInstance'
-import { transformUserInGuildNonStandard } from '../../helper/transformer/user'
+import { transformChannel } from '../../helper/transformer/channel'
 import RequestError from '../../models/Error/RequestError'
+import { Channel } from '../../types'
 import { KHAPIResponse } from '../../types/kaiheila/api'
-import { KHChannelViewResponse } from './channel.types'
+import { KHChannel } from '../../types/kaiheila/common'
+import {
+  ChannelListResponseInternal,
+  KHChannelListResponse,
+} from './channel.types'
 
 export class ChannelAPI {
   private self: BotInstance
@@ -14,27 +19,36 @@ export class ChannelAPI {
    * 获取频道列表
    * @param guildId 服务器id
    */
-  async list(guildId: string) {
+  async list(guildId: string): Promise<ChannelListResponseInternal> {
     const data = (
       await this.self.get('v3/channel/list', {
         guild_id: guildId,
       })
-    ).data as KHAPIResponse<any>
+    ).data as KHAPIResponse<KHChannelListResponse>
     if (data.code === 0) {
-      return data
+      return {
+        items: data.data.items.map(transformChannel),
+        meta: {
+          page: data.data.meta.page,
+          pageSize: data.data.meta.page_size,
+          pageTotal: data.data.meta.page_total,
+          total: data.data.meta.total,
+        },
+        sort: data.data.sort,
+      }
     } else {
       throw new RequestError(data.code, data.message)
     }
   }
 
-  async view(channelId: string) {
+  async view(channelId: string): Promise<Channel> {
     const data = (
       await this.self.get('v3/channel/view', {
         target_id: channelId,
       })
-    ).data as KHAPIResponse<KHChannelViewResponse>
+    ).data as KHAPIResponse<KHChannel>
     if (data.code === 0) {
-      return data.data
+      return transformChannel(data.data)
     } else {
       throw new RequestError(data.code, data.message)
     }
@@ -47,7 +61,7 @@ export class ChannelAPI {
     parentId?: string,
     limitAmount?: number,
     voiceQuality?: number
-  ) {
+  ): Promise<Channel> {
     const data = (
       await this.self.post('v3/channel/create', {
         guild_id: guildId,
@@ -57,15 +71,15 @@ export class ChannelAPI {
         limit_amount: limitAmount,
         voice_quality: voiceQuality,
       })
-    ).data as KHAPIResponse<KHChannelViewResponse>
+    ).data as KHAPIResponse<KHChannel>
     if (data.code === 0) {
-      return data.data
+      return transformChannel(data.data)
     } else {
       throw new RequestError(data.code, data.message)
     }
   }
 
-  async delete(channelId: string) {
+  async delete(channelId: string): Promise<boolean> {
     const data = (
       await this.self.post('v3/channel/delete', {
         channel_id: channelId,
@@ -78,7 +92,7 @@ export class ChannelAPI {
     }
   }
 
-  async moveUser(channelId: string, userIds: string[]) {
+  async moveUser(channelId: string, userIds: string[]): Promise<boolean> {
     const data = (
       await this.self.post('v3/channel/move-user', {
         target_id: channelId,

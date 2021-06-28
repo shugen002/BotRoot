@@ -3,8 +3,7 @@ import { ButtonClickEvent } from '../../types/event/button-click'
 import { EventBase } from '../../types/event/base'
 import { KHButtonClickEvent } from '../../types/kaiheila/event'
 import { KHSystemMessage } from '../../types/kaiheila/message'
-import { transformUser, transformUserInGuild } from './user'
-import { KHUser, KHUserInGuild } from '../../types/kaiheila/common'
+import { transformUser } from './user'
 
 export function transformEvent(message: KHSystemMessage): EventBase {
   switch (message.extra.type) {
