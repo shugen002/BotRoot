@@ -77,9 +77,12 @@ export class ChannelRoleAPI {
     channelId: string,
     type: 'role_id' | 'user_id',
     value: string,
-    allow: number,
-    deny: number
+    allow: number | undefined,
+    deny?: number
   ): Promise<ChannelRoleUpdateResponseInternal> {
+    if (typeof allow === 'undefined' && typeof deny === 'undefined') {
+      throw new Error('Argument Required: provide either allow or deny.')
+    }
     const data = (
       await this.self.post('v3/channel-role/update', {
         channel_id: channelId,

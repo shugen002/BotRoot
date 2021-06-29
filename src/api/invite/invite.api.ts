@@ -18,7 +18,7 @@ export class InviteAPI {
   private argChecker(guildId?: string, channelId?: string) {
     if (!guildId && !channelId)
       throw new Error(
-        'no guild id or channel id provided, should at least provide one.'
+        'Argument Required: no guild id or channel id provided, should at least provide one.'
       )
   }
 
