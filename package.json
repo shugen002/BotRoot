@@ -1,6 +1,6 @@
 {
   "name": "kaiheila-bot-root",
-  "version": "0.2.9-beta",
+  "version": "0.2.9",
   "description": "",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
