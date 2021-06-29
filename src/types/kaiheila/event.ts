@@ -8,7 +8,7 @@ export interface KHEvent {
 export interface KHButtonClickEvent extends KHEvent {
   type: 'message_btn_click'
   body: {
-    channel_type: string
+    channel_type: string | 'GROUP'
     msg_id: string
     guild_id: string
     user_id: string
